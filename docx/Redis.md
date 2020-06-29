@@ -6,6 +6,7 @@
 - 设置：save Nseconds Mcommond，每n秒执行M次写入操作，可设置多个save参数，持久化文件名、位置均可在配置文件中设置。
 - 优点：1、文件紧凑、小 2、适用容灾 3、性能较优 4、大数据集恢复速度较aof快
 - 缺点：1、会丢失最后一次持久化后的数据 2、大数据集时fork子进程比较耗时
+- 持久化命名：bgsave
 ##### AOF（追加）
 - 原理：将所有写指令追加到持久化文件末尾，重启时重读文件执行写指令
 - 设置：appendonly设置yes开启，appendfsync设置持久化频率（always：所有写指令都持久化一次；everysec（默认）：每秒钟执行一次；no：由操作系统决定，快但不安全）。（BGREWRITE）重写机制当文件越来越大时很多指令重复或者最后删除则持久化文件中只保留最后一条写操作或者剔除掉最后删掉的那条记录的命令从而使文件变小（no-appendfsync-on-rewrite no ：重写期间主进程是否继续将日志从缓冲区刷新到旧日志文件 
@@ -13,6 +14,7 @@ auto-aof-rewrite-percentage 100 文件重写需满足的增长率
 auto-aof-rewrite-min-size 64mb 文件重写需满足的大小 需同时满足增长率和文件大小才触发重写机制）；redis-check-aof --fix检查aof文件，遇到第一个错误即删除之后的所有操作。
 - 优点：1、耐久（持久化不影响性能） 2、只有追加 3、文件过大时可以重写  4、持久化文件可读性（未重写前可以恢复数据至想要的位置）
 - 缺点：1、文件体积大于rdb 2、速度可能差于rdb 3、可能重新载入时数据不一致
+- 重写命令： bgrewriteaof
 ##### Redis集群
 ###### redis集群搭建
 - 1、下载redis包http://download.redis.io/releases/redis-5.0.8.tar.gz
@@ -37,6 +39,10 @@ cluster-config-file nodes6501.conf 		# 集群生成的的配置文件名
 - 6、启动redis实例，/opt/redis/src/redis-server /opt/redis/6501/redis.conf (其他端口对应实例启用方式相同)
 - 7、设置集群 /opt/redis/src/redis-cli --cluster create IP:6501 IP:6502 IP:6503 IP:6504 IP:6505 IP:6506 --cluster-replicas 1 (设置三主三从的redis集群)
 - 8.验证，/opt/redis/src/redis-cli -h IP -p 6501 登录redis，然后查看info
+###### redis基本操作
+- redis-cli -h IP keys "key*"|xargs redis-cli -h IP del 删除指定key缓存
+- bgsave 手动触发rdb持久化
+- barewriteaof 手动触发aof重写
 
 ###### redis集群常用操作
 - redis-cli --cluster create IP:Port ... --cluster-replicas 1 创建集群

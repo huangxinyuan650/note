@@ -146,3 +146,45 @@ mode=read-write
 destinations=127.0.0.1:3307,127.0.0.1:3308
 
 ```
+
+#### 安装
+```shell
+### Ubuntu
+apt-get install mysql-server-5.7 mysql-client-5.7 -y 
+
+### CentOS
+# 下载安装包
+wget https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
+# 安装mysql
+rpm -ivh mysql57-community-release-el7-11.noarch.rpm
+yum install mysql-community-server
+# 查看mysql服务是否启动
+systemctl status mysqld.service
+# 启动mysql服务（未启动时）
+systemctl start mysqld.service
+# 获取root初始密码
+grep "password" /var/log/mysqld.log  # 获取默认密码
+
+# 登录数据库，设置密码
+mysql> set password for 'root'@'localhost'="your_password";
+```
+***
+#### 设置登录失败策略
+* 适用版本：MySql 5.7.17以上
+* 方式：安装Connection-Control插件
+* 步骤:
+    * 1. 插件安装(登录进入mysql控制终端后执行```INSTALL PLUGIN CONNECTION_CONTROL
+  SONAME 'connection_control.so';
+INSTALL PLUGIN CONNECTION_CONTROL_FAILED_LOGIN_ATTEMPTS
+  SONAME 'connection_control.so';```)
+    * 2. 修改配置（在mysqld的配置中添加: ```connection_control_failed_connections_threshold=失败次数
+  connection_control_min_connection_delay=锁定后延迟登录时间（单位为毫秒) connection_control_max_connection_delay=最大延迟时间（登录锁定后每尝试一次延迟时间就会加一次锁定后延迟时间，增加次参数比较恶意导致无法访问）```）
+    * 3. 重启mysql服务（```systemctl restart mysql.service```）
+
+***
+#### 备份(gzip压缩)
+```shell
+/usr/bin/mysqldump --lock-tables=false --single-transaction --ignore-table=hcm_core.wf_runtime_log --ignore-table=hcm_core.at_singin_location_log  -h$HOST -u$USER -p$PASSWORD $DBNAME | gzip > $DIR/$DBNAME-$NOW.sql.gz
+echo "output:  $DIR/$DBNAME-$NOW.sql.gz "
+
+```

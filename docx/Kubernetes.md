@@ -34,3 +34,13 @@ kubectl apply -f 28.app.yaml
 ```Shell
 kubectl delete -f 28.app.yaml
 ```
+#### ETCD升级（3.3->3.4）
+- step1:下载etcd3.4.3（https://github.com/etcd-io/etcd/releases/download/v3.4.3/etcd-v3.4.3-linux-amd64.tar.gz），解压 tar -zxvf etcd-v3.4.3-linux-amd64.tar.gz
+- step2: 停掉kube-apiserver，systemctl stop kube-apiserver
+- step3: etcd原数据备份，etcdctl backup --data-dir=/var/lib/etcd --backup-dir=/root/etcd_backup/back_data
+- step4: 停掉etcd服务，systemctl stop etcd
+- step5: 更新etcd二进制文件，cd etcd-v3.4.3-linux-amd64 && cp etcd etcdctl /opt/kube/bin
+- step6: 修改etcd service配置参数，添加--initial-cluster-state new \ --logger zap \ --log-outputs stderr \ --heartbeat-interval=100 \ --election-timeout=500 \ --snapshot-count=5000 \
+- step7: 恢复etcd备份数据，etcd -data-dir=/root/etcd_backup/back_data --force-new-cluster 待执行完成时，终止恢复程序
+- step8: 启动etcd服务，systemctl daemon-reload && systemctl start etcd && systemctl start kube-apiserver
+- step9: 确认服务正常，kubectl get pod

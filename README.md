@@ -3,6 +3,7 @@
 - [Python](docx/Python.md)
 - [Java](docx/Java.md)
 - [Js](docx/Js.md)
+
 #### Database
 - [Mysql](docx/Mysql.md)
 - [Redis](docx/Redis.md)
@@ -14,6 +15,7 @@
 - [LVM](docx/LVM.md)
 - [Nginx](docx/Nginx.md)
 - [Squid](docx/Squid.md)
+- [Ubuntu装机](docx/Ubuntu.md)
 
 #### New
 - [Docker](docx/Docker.md)
@@ -21,5 +23,7 @@
 - [K8sInstall](docx/K8sInstall.md)
 - [Ansible](docx/Ansible.md)
 - [EFK](docx/EFK.md)
+- [Celery](docx/Celery.md)
+- [WebSocket](docx/WebSocket.md)
 
 ### 未完待续！！！
