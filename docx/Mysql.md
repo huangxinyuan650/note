@@ -184,7 +184,7 @@ INSTALL PLUGIN CONNECTION_CONTROL_FAILED_LOGIN_ATTEMPTS
 ***
 #### 备份(gzip压缩)
 ```shell
-/usr/bin/mysqldump --lock-tables=false --single-transaction --ignore-table=hcm_core.wf_runtime_log --ignore-table=hcm_core.at_singin_location_log  -h$HOST -u$USER -p$PASSWORD $DBNAME | gzip > $DIR/$DBNAME-$NOW.sql.gz
+/usr/bin/mysqldump --lock-tables=false --single-transaction --ignore-table=db.table1 --ignore-table=db.table2  -h$HOST -u$USER -p$PASSWORD $DBNAME | gzip > $DIR/$DBNAME-$NOW.sql.gz
 echo "output:  $DIR/$DBNAME-$NOW.sql.gz "
 
 ```
