@@ -15,6 +15,56 @@ def fun_1(arg):
     print arg
 fun_1("hxy")
 ```
+```python
+# _*_ coding:utf-8_*_
+# Author:   Ace Huang
+# Time: 2020/7/2 08:44
+# File: Standard.py
+
+from functools import lru_cache, singledispatch
+
+"""
+setDefault(key,default).operate 相对于先get再赋值少了一次查询
+ex: 将a注入到b中key为a的列表中
+"""
+a = [1, 2, 3, 4, 5]
+b = {'a': []}
+[b.setdefault('a', []).append(_) for _ in a]
+
+"""
+functools.lru_cache(maxsize=128,typed=False)：缓存被装饰函数结果，若typed为True则将结果分开保存
+functools.singledispatch：实现dispatch功能（方法复写）
+"""
+
+
+@lru_cache()
+def fibonacci(n):
+    return n if n < 2 else fibonacci(n - 2) + fibonacci(n - 1)
+
+
+@singledispatch
+def obj_convert(obj):
+    return obj
+
+
+@obj_convert.register(str)
+def _(obj):
+    return str(obj)
+
+
+@obj_convert.register(int)
+def _(obj):
+    return int(obj)
+
+
+@obj_convert.register(tuple)
+@obj_convert.register(list)
+def _(obj):
+    return list(obj)
+
+
+```
+
 当装饰器带有参数时，需要在装饰器内部重新再定义一个方法来接收被修饰方法对象经过处理再返回被修饰方法然后在修饰器中再将新建方法返回
 ```python
 __new__,__init__,__call__:(先new再init)
