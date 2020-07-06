@@ -27,9 +27,9 @@ from functools import lru_cache, singledispatch
 setDefault(key,default).operate 相对于先get再赋值少了一次查询
 ex: 将a注入到b中key为a的列表中
 """
-a = [1, 2, 3, 4, 5]
-b = {'a': []}
-[b.setdefault('a', []).append(_) for _ in a]
+a = [{'a':1}, {'a':2}, {'a':3}, {'a':4}, {'a':5}]
+b = {'b': []}
+[b.setdefault('a', []).append(_['a']) for _ in a]
 
 """
 functools.lru_cache(maxsize=128,typed=False)：缓存被装饰函数结果，若typed为True则将结果分开保存
