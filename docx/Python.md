@@ -65,6 +65,16 @@ def _(obj):
 
 ```
 
+
+
+
+
+
+
+
+
+
+
 当装饰器带有参数时，需要在装饰器内部重新再定义一个方法来接收被修饰方法对象经过处理再返回被修饰方法然后在修饰器中再将新建方法返回
 ```python
 __new__,__init__,__call__:(先new再init)
@@ -93,9 +103,8 @@ t()
 @classmethod    通过类对象实例调用并将对象本身作为参数传入
 ***
 **字符串格式化**
-“{index1},{index2}”.format(*list)
-“{key1},{key2}”.format(**dict)
-***
-python测试框架
+"{index1},{index2}".format(*list)
+"{key1},{key2}".format(**dict)
+f"{var1},{var2}" var1、var2该语句可访问的变量
 ***
 xrange(x,y)生成一个x到y的等比数列
