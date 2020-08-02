@@ -1,3 +1,70 @@
+#### 简易HttpServer
+```
+# _*_ coding:utf-8_*_
+# Author:   Ace Huang
+# Time: 2020/8/2 09:09
+# File: http_service.py
+
+import socket
+import sys
+
+STATUS_FLAG = True
+BUFFER_SIZE = 1024
+GET_PIC_RESPONSE_HEADER = 'HTTP/1.x 200 ok\r\nContent-Type: image/jpg\r\n\r\n'
+BAD_REQUEST_HEADER = 'HTTP/1.x 400 BadRequest\r\nContent-Type: text/html\r\n\r\n'
+GET_RESPONSE_HEADER = 'HTTP/1.x 200 ok\r\nContent-Type: text/html\r\n\r\n'
+POST_RESPONSE_HEADER = 'HTTP/1.x 200 ok\r\nContent-Type: text/html\r\n\r\n'
+
+_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+_socket.bind(('127.0.0.1', 2650))
+_socket.listen(5)
+
+
+def get(client, header):
+    """
+    GET请求处理
+    :param client:
+    :param header:
+    :return:
+    """
+    print(header)
+    _res = GET_RESPONSE_HEADER + 'Hello World\r\n' + '\r\n'.join(str(header).split('\\r\\n'))
+    client.send(_res.encode('utf-8'))
+    client.close()
+
+
+def post(client, header):
+    """
+    POST请求处理
+    :param client:
+    :param header:
+    :return:
+    """
+    print(header)
+    _res = GET_RESPONSE_HEADER + 'Hello World\r\n' + header.split()
+    client.send(_res.encode('utf-8'))
+    client.close()
+
+
+while STATUS_FLAG:
+    _request_map = {
+        'GET': 'get',
+        'POST': 'post'
+    }
+    try:
+        _conn, _addr = _socket.accept()
+        _request_header = _conn.recv(1024)
+        _list = str(_request_header)[2:].split('\\r\\n')
+        _func = _request_map[_list[0].split(' ')[0]]
+        _func = getattr(sys.modules[__name__], _func)
+        _func(_conn, _request_header)
+    except Exception as e:
+        _res_str = BAD_REQUEST_HEADER
+        _conn.send(_res_str.encode('utf-8'))
+        print(e.args)
+
+```
+
 **闭包:**
 指延伸了作用域的函数，其中包含函数定义体中引用、但是不在定义体中定义的非全局变量。（函数访问定义体之外定义的非全局变量）
 ***
