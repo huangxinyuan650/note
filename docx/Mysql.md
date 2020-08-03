@@ -221,3 +221,10 @@ echo "output:  $DIR/$DBNAME-$NOW.sql.gz "
 - 一致性（Consistency），事物前后总体一致（即不会出现数据莫名改变、一般由业务保证）
 - 隔离性（Isolation），事物间相互隔离，脏读（读了未提交的事物中修改的值，读已提交）、不可重复读（分别读了事物提交前后的数据值不一致，可重复读（读的时候版本不一致可用undolog恢复））、幻读（分别读了事物提交前后的数据条数不一致，可串行化）
 - 持久性（Durability），改变为永久改变（redolog（先写redolog再写缓存，这样突然宕机也可以保证数据持久性））
+
+### 锁
+#### 行锁（row lock）和表锁（table lock）
+只有当查询的字段是主键或者加了索引并且是指定匹配才触发行锁，其余情况除了未查询到结果不使用锁剩下的都是触发行锁
+```
+select * from table_name where  field = 1 for update
+```
