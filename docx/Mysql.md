@@ -224,7 +224,7 @@ echo "output:  $DIR/$DBNAME-$NOW.sql.gz "
 
 ### 锁
 #### 行锁（row lock）和表锁（table lock）
-只有当查询的字段是主键或者加了索引并且是指定匹配才触发行锁，其余情况除了未查询到结果不使用锁剩下的都是触发行锁
+只有当查询的字段是主键或者加了索引并且是指定匹配才触发行锁，其余情况除了未查询到结果不使用锁剩下的都是触发表锁
 ```
 select * from table_name where  field = 1 for update
 ```
