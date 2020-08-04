@@ -65,6 +65,13 @@ while STATUS_FLAG:
 
 ```
 
+### Tornado
+- 端口监听部分：
+实际的socket套接字的创建是在bindSocket方法中，然后该方法被TCPServer的listen方法使用，而HttpServer继承了TCPServer并且initialize方法创建了TCPServer实例
+```
+HttpServer.initialize -> TCPServer.listen -> bindSocket -> socket.bind/listen
+```
+
 **闭包:**
 指延伸了作用域的函数，其中包含函数定义体中引用、但是不在定义体中定义的非全局变量。（函数访问定义体之外定义的非全局变量）
 ***
