@@ -228,3 +228,10 @@ echo "output:  $DIR/$DBNAME-$NOW.sql.gz "
 ```
 select * from table_name where  field = 1 for update
 ```
+
+### 性能优化
+#### 单条查询剖析（show profile）
+- 开启profiling   set profiling=1  （会话级别）
+- 执行查询语句
+- 查看profiles信息show profiles; 得到的列表列举了执行的语句，找到sql对应的query_id
+- 查看profile对应的具体详情  show profile for query QUERY_ID;
