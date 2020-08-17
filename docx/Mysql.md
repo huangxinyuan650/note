@@ -235,3 +235,7 @@ select * from table_name where  field = 1 for update
 - 执行查询语句
 - 查看profiles信息show profiles; 得到的列表列举了执行的语句，找到sql对应的query_id
 - 查看profile对应的具体详情  show profile for query QUERY_ID;
+
+##### Tips
+ * [ ] 指向记录的指针长度决定了表最大的记录数，mysql支持8字节，MyISAM默认6字节（256TB）
+ * [ ] MyISAM表有三个文件（索引文件-MYI、表结构文件-frm、数据文件-MYD）、表级锁
