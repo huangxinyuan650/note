@@ -253,3 +253,5 @@ select * from table_name where  field = 1 for update
  * [ ] 指向记录的指针长度决定了表最大的记录数，mysql支持8字节，MyISAM默认6字节（256TB）
  * [ ] MyISAM表有三个文件（索引文件-MYI、表结构文件-frm、数据文件-MYD）、表级锁
  * [ ] 创建前缀索引(增加一个key)，alter table table_name add key(text_field(len));
+ * [ ] 创建全文索引，alter table table_name add fulltext index index_name(field,...); 全文索引需使用MyISAM引擎;select * from table_name where match(fulltext_field,...) against('str');
+ * [ ] 修改表的Engine，alter table table_name ENGINE=EngineName
