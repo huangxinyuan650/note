@@ -255,3 +255,5 @@ select * from table_name where  field = 1 for update
  * [ ] 创建前缀索引(增加一个key)，alter table table_name add key(text_field(len));
  * [ ] 创建全文索引，alter table table_name add fulltext index index_name(field,...); 全文索引需使用MyISAM引擎;select * from table_name where match(fulltext_field,...) against('str');
  * [ ] 修改表的Engine，alter table table_name ENGINE=EngineName
+ * [ ] 插入查询sql(映射与字段顺序有关字段名无关)，insert into table_name1(field1,field2,...) select field_a,field_b,... from table_name2;
+ * [ ] 更新查询，update table1 set table1.field_1 = table2.filed_a from table1,table2 where table1.field2=table2.field_b;
