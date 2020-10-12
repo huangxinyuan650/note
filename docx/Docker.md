@@ -1,3 +1,8 @@
+## Docker
+
+### 网络原理说明
+docker0作为一个网桥（网关）处于容器veth与容器veth以及容器veth和宿主机网卡之间
+
 **docker安装**
 1. 清除之前安装的
 sudo apt-get remove docker docker-engine docker.io

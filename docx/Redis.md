@@ -66,3 +66,82 @@ cluster-config-file nodes6501.conf 		# 集群生成的的配置文件名
 ###### 集群节点迁移原理
 Master实例迁移：需先将原Master的slave挂到新的master，然后Master实例的slot迁移至新Master，删除原master
 Slave实例迁移：直接将新Slave实例挂载到Master上，然后去掉原Slave的挂载即可
+
+### Redis数据结构说明
+```
+// redisServer数据结构
+struct redisServer {
+    // 服务器中数据库数量(默认16)
+    int dbnum;
+    // 一个数组保存服务器中的所有数据库
+    redisDB *db;
+}
+
+// redisDB数据结构
+struct redisDB {
+    // 保存一个库中所有的键值对{key1:value1,key2:value2,...}
+    dict *dict;
+    // 保存key的过期时间{key1:timestamp1,key2:timestamp2,...}
+    // expire、expireat、pexpire最终都会转换成pexpireat命令，保存到期Unix时间戳
+    dict *expires;
+} redisDb;
+
+```
+
+### Redis value数据类型（String、List、Hash、Set、ZSet）
+```
+value类型
+typedef struct redisObject {
+
+    // 类型(REDIS_STRING、REDIS_LIST、REDIS_HASH、REDIS_SET、REDIS_ZSET)
+    unsigned type:4;
+
+    // 编码(
+    // REDIS_ENCODING_INT   long类型的整数、
+    // REDIS_ENCODING_EMBSTR    embstr编码的简单动态字符串、
+    // REDIS_ENCODING_RAW   简单动态字符串、
+    // REDIS_ENCODING_HT    字典、
+    // REDIS_ENCODING_LINKEDLIST    双端链表、
+    // REDIS_ENCODING_ZIPLIST   压缩列表、
+    // REDIS_ENCODING_INTSET    整数集合、
+    // REDIS_ENCODING_SKIPLIST  跳跃表和字典)
+    unsigned encoding:4;
+
+    // 指向底层实现数据结构的指针
+    void *ptr;
+    //...
+} robj;
+```
+
+#### 字符串（String）
+##### 数据结构
+```
+struct sdshdr{
+    int len; //字符串长度，buf中已使用长度
+    int free;  //buf中未使用长度
+    char buf[]; //存储字符串数据，总长度=len + free + 1
+}
+```
+字符串扩展原则：小于1M，则free长度等于扩展长度，大于1M的free长度等于1M
+##### 基本操作
+- 设置值 set key value [EX seconds|PX milliseconds]
+- 获取key的值 get key
+- expire|expireat|pexpire|pexpireat key time  为指定key设置超时时间（最终都是转换为pexpireat命令）
+
+
+#### 列表（List）
+##### 数据结构（ziplist或者linkedlist）
+
+#### Hash（哈希）
+##### 数据结构（ziplist或者hashtable）
+当哈希对象保存的键值长度都小于65字节且键值对数量小于512时采用ziplist否则采用hashtable（hash-max-ziplist-value、hash-max-ziplist-entries）
+
+#### Set（集合）
+##### 数据结构（intset或者hashtable）
+当集合对象保存的所有值都为整数且元素数量小于512时采用intset否则采用hashtable（set-max-intset-entries）
+使用hashtable时键为元素字符串值为null
+
+#### ZSet（有序集合）
+##### 数据结构（ziplist或者skiplist）
+当有序集合元素数量小于128个且元素成员长度都小于64字节采用ziplist否则采用skiplist（zset-max-ziplist-entries、zset-max-ziplist-value）
+ziplist结构（\[元素1成员、元素1分值、元素2成员、元素2分值、...\]）按分值由小到大存储
