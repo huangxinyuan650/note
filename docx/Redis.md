@@ -67,6 +67,7 @@ cluster-config-file nodes6501.conf 		# 集群生成的的配置文件名
 Master实例迁移：需先将原Master的slave挂到新的master，然后Master实例的slot迁移至新Master，删除原master
 Slave实例迁移：直接将新Slave实例挂载到Master上，然后去掉原Slave的挂载即可
 
+
 ### Redis数据结构说明
 ```
 // redisServer数据结构
