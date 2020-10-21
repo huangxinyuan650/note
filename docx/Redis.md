@@ -15,8 +15,11 @@ auto-aof-rewrite-min-size 64mb 文件重写需满足的大小 需同时满足增
 - 优点：1、耐久（持久化不影响性能） 2、只有追加 3、文件过大时可以重写  4、持久化文件可读性（未重写前可以恢复数据至想要的位置）
 - 缺点：1、文件体积大于rdb 2、速度可能差于rdb 3、可能重新载入时数据不一致
 - 重写命令： bgrewriteaof
+
 ##### Redis集群
-###### redis集群搭建
+###### redis集群说明
+- slot（槽）:2048*8=16384个槽分布在所有的master上，key->slot->node，根据key计算出所属的槽并找到对应的node然后move到对应的node进行操作
+###### redis集群搭建（docker搭建见文末说明）
 - 1、下载redis包http://download.redis.io/releases/redis-5.0.8.tar.gz
 - 2、将redis包解压至需要存放目录（/opt/redis）
 - 3、编译redis，cd /opt/redis && make (前提是系统已安装好make和gcc，apt-get install make gcc -y)，确认最后未报错
@@ -146,3 +149,15 @@ struct sdshdr{
 ##### 数据结构（ziplist或者skiplist）
 当有序集合元素数量小于128个且元素成员长度都小于64字节采用ziplist否则采用skiplist（zset-max-ziplist-entries、zset-max-ziplist-value）
 ziplist结构（\[元素1成员、元素1分值、元素2成员、元素2分值、...\]）按分值由小到大存储
+
+```
+# docker创建redis集群（注意防火墙）
+docker run --name redis-node1 -p 8001:8001 -p 18001:18001 -it -d  redis:6.0.5 redis-server --port 8001 --cluster-enabled yes --bind 0.0.0.0
+docker run --name redis-node2 -p 8002:8002 -p 18002:18002 -it -d  redis:6.0.5 redis-server --port 8002 --cluster-enabled yes --bind 0.0.0.0
+docker run --name redis-node3 -p 8003:8003 -p 18003:18003 -it -d  redis:6.0.5 redis-server --port 8003 --cluster-enabled yes --bind 0.0.0.0
+docker run --name redis-node4 -p 8004:8004 -p 18004:18004 -it -d  redis:6.0.5 redis-server --port 8004 --cluster-enabled yes --bind 0.0.0.0
+docker run --name redis-node5 -p 8005:8005 -p 18005:18005 -it -d  redis:6.0.5 redis-server --port 8005 --cluster-enabled yes --bind 0.0.0.0
+docker run --name redis-node6 -p 8006:8006 -p 18006:18006 -it -d  redis:6.0.5 redis-server --port 8006 --cluster-enabled yes --bind 0.0.0.0
+
+/opt/redis/src/redis-cli --cluster create IP:6501 IP:6502 IP:6503 IP:6504 IP:6505 IP:6506 --cluster-replicas 1
+```
