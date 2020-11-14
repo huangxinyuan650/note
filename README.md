@@ -19,6 +19,8 @@
 
 #### New
 - [Docker](docx/Docker.md)
+- [DockerRegistry](docx/DockerRegistry.md)
+- [Gitlab](docx/Gitlab.md)
 - [Kubernetes](docx/Kubernetes.md)
 - [K8sInstall](docx/K8sInstall.md)
 - [Ansible](docx/Ansible.md)
