@@ -6,13 +6,22 @@
 - 列表（list）
 - 字典（dict）
 - 集合（set）：集合中所有元素必须可散列，底层数据结构为哈希表（字典中只存放键没有值）
+
 #### 可变类型与不可变类型
 - 可变类型：数字、字符串、元组（元素为不可变类型）
 - 不可变类型：所有映射
+
 #### 哈希表、可散列与不可散列
 - 哈希表：哈希函数+哈希冲突（1、再哈希 2、拉链法）
 - 可散列数据类型：在对象生命周期中散列值不变（需实现__hash__、__eq__方法）。原子不可变类型、frozenset是可散列
 - 不可散列数据类型：
+
+#### 实例方法、类方法、静态方法
+- 实例方法：绑定到类的实例上，隐式传入self。（a.fun(*xargs,**kwargs)或者A.fun(a,*xargs,**kwargs)）
+- 类方法（classmethod）：绑定到类对象上，隐式传入cls。(A.fun(*xargs,**kwargs)或者a.fun(*xargs,**kwargs))
+- 静态方法（staticmethod）：没有参数绑定，和普通函数一样。(A.fun(*xargs,**kwargs)或者a.fun(*xargs,**kwargs))
+- staticmethod为啥不直接用外部函数代替：函数属于类但不用访问类，通过子类的覆盖继承可更好的组织代码
+
 #### 迭代器、生成器、协程
 - 可迭代对象：遵循了可迭代协议（实现了iter()方法）的对象
 - 迭代器：实现了迭代器协议（实现了iter和next方法）
@@ -68,23 +77,111 @@ productor()
 - 消息队列：在内存中建立队列数据模型，多个进程操作队列来存取内容进行通信
 - 共享内存：在内存中开辟一块对多个进程可见的空间，多个进程可读可写，但没次写入的都会覆盖上次内容
 - 信号量：一个进程向另一个进程发送一个信号来传递某种信息，接收者根据信号做出相应操作
-- 信号量：
-- 套接字：
 
 ##### 多线程（CPU调度的最小单元）
 
 ###### 线程间通信（直接共享内存了，加锁方式）
-- threading.Lock()
-- threading.Rlock()
+- threading.Lock()：基本锁对象，每次只能锁一次，其余锁请求需等待锁释放后才能获取
+- threading.Rlock()：可重入锁，可多次锁定多次释放，acquire和release成对出现即可
 - threading.Condition()
 - threading.Event()
 
+```
+# _*_ coding:utf-8_*_
+# Author:   Ace Huang
+# Time: 2021/1/10 17:26
+# File: future_demo.py
+import requests
+import time
+from concurrent import futures
+
+FILE_BASE = '~/develop_my/leetcode/source'
+
+
+def download_fun(source_name):
+    _re = requests.get(f'http://127.0.0.1:2650/{source_name}')
+    save_source(content=_re.content, file_name=source_name)
+    return source_name
+
+
+def save_source(content, file_name):
+    with open(f'{FILE_BASE}/{file_name}', 'wb') as f:
+        f.write(content)
+        print(f'{file_name} save successed!!!')
+
+
+def down_main():
+    _time1 = time.time()
+    _list = [f'sea{_}.png' for _ in range(1, 101)]
+
+    # # 多线程方案 concurrent.futures.ThreadPoolExecutor
+    with futures.ThreadPoolExecutor(max_workers=30) as executor:
+        # 方法一：直接使用executor执行所有任务
+        # _re_list = executor.map(download_fun, _list)
+
+        # 方法二：使用submit来一个一个任务添加，并通过futores.as_completed方法获取到已经执行完成的futures，使用futures.result获取结果
+        _todo = []
+        for _ in _list:
+            _f = executor.submit(download_fun, _)
+            _todo.append(_f)
+            print(f'Schedule:{_}')
+        for _ in futures.as_completed(_todo):
+            print(f'Completed:{_.result()}')
+
+    # 多进程方案 concurrent.futures.ProcessPoolExecutor
+    # with futures.ProcessPoolExecutor() as executor:
+    #     executor.map(download_fun, _list)
+
+    # print(_re_list)
+    # for _ in range(1, 101):
+    #     _file_name = f'sea{_}.png'
+    #     download_fun(_file_name)
+    #     # save_source(content=_content, file_name=_file_name)
+    print(f'总耗时：{(time.time() - _time1)}')
+
+
+if __name__ == '__main__':
+    down_main()
+
+
+```
 #### 装饰器
-- 闭包：
+- 闭包：指延伸了作用域的函数，其中包含函数定义体中引用、但是不在定义体中定义的非全局变量。（函数访问定义体之外定义的非全局变量）
 - 解释：在不改变函数调用方式的情况下 对函数进行额外功能的封装，装饰一个函数 转给他一个其他的功能
 
-#### 单例
+#### 单例：确保一个类只有一个实例（Python天然单例，因为模块在第一次导入时就生成pyc文件，再导入就直接加载pyc文件了）
+```
+# 装饰器
+import threading
+def single_w_demo(cls):
+    _instance = {}
 
+    def r_w(*xargs, **kwargs):
+        if not _instance.get(cls):
+            threading.Lock()
+            if not _instance.get(cls):
+                _instance[cls] = cls(*xargs, **kwargs)
+            threading.RLock()
+        return _instance[cls]
+
+    return r_w
+
+
+@single_w_demo
+class B(object):
+    pass
+
+# 类
+class C(object):
+    _instance_lock = threading.Lock()
+
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(C, '_instance'):
+            with C._instance_lock:
+                if not hasattr(C, '_instance'):
+                    setattr(C, '_instance', object.__new__(cls))
+        return getattr(C, '_instance')
+```
 
 #### 简易HttpServer
 ```
@@ -160,22 +257,6 @@ while STATUS_FLAG:
 HttpServer.initialize -> TCPServer.listen -> bindSocket -> socket.bind/listen
 ```
 
-**闭包:**
-指延伸了作用域的函数，其中包含函数定义体中引用、但是不在定义体中定义的非全局变量。（函数访问定义体之外定义的非全局变量）
-***
-**装饰器：**
-```python
-def dec_test(args):
-    print args
-    def des_2(func):
-        print func.__name__
-        return func
-    return des_2
-
-@dec_test(args="huang”)
-def fun_1(arg):
-    print arg
-fun_1("hxy")
 ```
 ```python
 # _*_ coding:utf-8_*_
@@ -226,47 +307,3 @@ def _(obj):
 
 
 ```
-
-
-
-
-
-
-
-
-
-
-
-当装饰器带有参数时，需要在装饰器内部重新再定义一个方法来接收被修饰方法对象经过处理再返回被修饰方法然后在修饰器中再将新建方法返回
-```python
-__new__,__init__,__call__:(先new再init)
-class Test(object):
-    def __new__(cls, *args, **kwargs):
-        print 'new'
-        return super(Test, cls).__new__(cls, *args, **kwargs)#不加不会调用用init方法
-```
-#__new__必须有返回值，返回实例化出来的实例，如果__new__创建的是当前类的实例，会自动调用__init__函数，通过return语句里面调用的__new__函数的第一个参数是cls来保证是当前类实例，如果是其他类的类名，；那么实际创建返回的就是其他类的实例，其实就不会调用当前类的__init__函数，也不会调用其他类的__init__函数。
-
-```python
-    def __init__(self, x, y):
-        print 'Init'
-        self.x = x
-        self.y = y
-        self.z = (self.x, self.y)
-    def __call__(self, *args, **kwargs):
-        print 'call'
-t = Test(1, 2)
-t()
-```
-对象通过提供__call__(slef, [,*args [,**kwargs]])方法可以模拟函数的行为，如果一个对象x提供了该方法，就可以像函数一样使用它，也就是说x(arg1, arg2...) 等同于调用x.__call__(self, arg1, arg2) 
-***
-**静态方法和类方法：**
-@staticmethod 通过类名调用，
-@classmethod    通过类对象实例调用并将对象本身作为参数传入
-***
-**字符串格式化**
-"{index1},{index2}".format(*list)
-"{key1},{key2}".format(**dict)
-f"{var1},{var2}" var1、var2该语句可访问的变量
-***
-xrange(x,y)生成一个x到y的等比数列
