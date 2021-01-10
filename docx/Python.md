@@ -83,8 +83,8 @@ productor()
 ###### 线程间通信（直接共享内存了，加锁方式）
 - threading.Lock()：基本锁对象，每次只能锁一次，其余锁请求需等待锁释放后才能获取
 - threading.Rlock()：可重入锁，可多次锁定多次释放，acquire和release成对出现即可
-- threading.Condition()
-- threading.Event()
+- threading.Condition()：acquire、release和Lock一样，但提供wait()（挂起）、notify(n)（对多唤醒n和线程）、notifyAll(唤醒所有wait线程)
+- threading.Event()：线程中立个flag（默认为False），当一个或者多个线程遇到event.wait()阻塞时，直到flag变成True时(event.set())继续。提供了wait()(阻塞线程将flag设置为False)、set()(flag设置为True)、clear()(将flag设置为False)、isSet()(仅当flag为True时返回)
 
 ```
 # _*_ coding:utf-8_*_
