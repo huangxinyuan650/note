@@ -172,6 +172,7 @@ struct sdshdr{
 - 设置值 set key value [EX seconds|PX milliseconds]
 - 获取key的值 get key
 - expire|expireat|pexpire|pexpireat key time  为指定key设置超时时间（最终都是转换为pexpireat命令）
+- setnx key value 原子性的设置数据并设置过期时间，当key存在返回0，key不存在设置完成后返回1，setnx和expire配置使用做避免死锁的分布式锁
 
 ##### 列表（List）
 ###### 数据结构（ziplist或者linkedlist）
