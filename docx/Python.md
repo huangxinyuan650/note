@@ -185,7 +185,7 @@ if __name__ == '__main__':
 
 ##### 多线程（CPU调度的最小单元）
 
-###### 线程间通信（直接共享内存了，加锁方式、或者使用queue）
+###### 线程间通信（直接global共享变量，加锁方式、或者使用queue）
 - threading.Lock()：基本锁对象，每次只能锁一次，其余锁请求需等待锁释放后才能获取
 - threading.Rlock()：可重入锁，可多次锁定多次释放，acquire和release成对出现即可
 - threading.Condition()：acquire、release和Lock一样，但提供wait()（挂起）、notify(n)（对多唤醒n和线程）、notifyAll(唤醒所有wait线程)
@@ -248,6 +248,67 @@ def down_main():
 if __name__ == '__main__':
     down_main()
 
+
+```
+
+```
+# _*_ coding:utf-8_*_
+# Author:   Ace Huang
+# Time: 2020/12/25 08:37
+# File: multi_thread_demo.py
+
+import requests
+import uuid
+import threading
+import time
+from queue import Queue
+
+count = 0
+
+
+# 全局变量加锁，传入锁
+# def down_one(file_name: str, lock: threading.RLock):
+
+def down_one(file_name: str, stat_queue):
+    """
+    下载单个文件
+    """
+    global count
+    _start_time = time.time()
+    _save_dir = '/Users/huangxinyuan/develop_my/leetcode/source'
+    _response = requests.request(method='GET', url=f'http://127.0.0.1:2650/{file_name}')
+
+    if _response.status_code == 200:
+        with open(file=f'{_save_dir}/{uuid.uuid4()}{file_name}', mode='wb+') as f:
+            f.write(_response.content)
+        print('Success')
+    else:
+        print('Failed')
+    # lock.acquire()
+    # count += 1
+    # lock.release()
+    if stat_queue.empty():
+        stat_queue.put(1)
+        print('Queue +1')
+    else:
+        stat_queue.put(stat_queue.get() + 1)
+        print('Queue +-1')
+    print(f'下载{file_name}共耗时{time.time() - _start_time}\n已下载{count}个文件\n')
+
+
+if __name__ == '__main__':
+    _begin_time = time.time()
+    # # 全局变量加锁
+    # _lock = threading.RLock()
+    # _t_list = [threading.Thread(target=down_one, args=(f'sea{_}.png', _lock,)) for _ in range(30)]
+
+    # Queue
+    _queue = Queue(maxsize=5)
+    _t_list = [threading.Thread(target=down_one, args=(f'sea{_}.png', _queue,)) for _ in range(30)]
+
+    [_.start() for _ in _t_list]
+    [_.join() for _ in _t_list]
+    print(f'总耗时：{time.time() - _begin_time}')
 
 ```
 #### 装饰器
