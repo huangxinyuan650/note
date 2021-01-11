@@ -75,8 +75,8 @@ productor()
 - 等待态：暂不满足执行条件，待条件满足，才变成就绪态（等待条件满足后变成就绪态）
 
 ###### 孤儿进程、僵尸进程
-- 孤儿进程：父进程早于子进程退出（孤儿进程将有init进程收养）
-- 僵尸进程：子进程早于父进程退出，但父进程未处理子进程退出状态，子进程变成僵尸进程（保留少量PCB信息在内存中）
+- 孤儿进程：父进程早于子进程退出（孤儿进程将有init进程收养）。(无危害不用管)
+- 僵尸进程：子进程早于父进程退出，但父进程未处理子进程退出状态，子进程变成僵尸进程（保留少量PCB信息在内存中）。（top的zombie代表僵尸进程数，ps -aux｜grep Z找到STAT为Z的进程，ps -ef｜grep 进程号找到父进程PPID，kill -9 PPID）
 
 ###### 进程间通信
 - 管道：在内存中生成管道对象，多个进程操作同一个管道即可实现通信。（Pipe类，返回一个含有两个connection的元组，进程通过这两个connection进行通信）
@@ -84,9 +84,108 @@ productor()
 - 共享内存：在内存中开辟一块对多个进程可见的空间，多个进程可读可写，但没次写入的都会覆盖上次内容。（Value、Array类，）
 - 信号量：一个进程向另一个进程发送一个信号来传递某种信息，接收者根据信号做出相应操作。（Semaphore类，控制并发数，acquire+1，release-1）
 
+```
+# _*_ coding:utf-8_*_
+# Author:   Ace Huang
+# Time: 2021/1/10 12:11
+# File: multi_process_demo.py
+from multiprocessing import Process, Pipe, Value, Queue, Array, Semaphore, Manager
+from os import getpid
+import requests
+import time
+
+
+def down_fun(file_name):
+    _s_start = time.time()
+    _re = requests.get(f'http://127.0.0.1:2650/{file_name}')
+    with open(f'/Users/huangxinyuan/develop_my/leetcode/source/{file_name}', 'wb') as _f:
+        _f.write(_re.content)
+        print(f'{file_name} has been saved!!!\n')
+    print(f'{file_name}下载耗时：{time.time() - _s_start}\n下载进程号为：{getpid()}\n')
+
+
+def down_one(file_name, msg_tool):
+    print('P1 send message:Ping\n')
+    # # 管道用法
+    # msg_tool.send('Ping')
+
+    # # 消息队列用法
+    # msg_tool.put('Ping', block=True)
+
+    # 共享内存用法 Value、Array
+    # msg_tool.value = 'P'
+    # msg_tool[0] = 'P'
+    # msg_tool[1] = 'i'
+    # msg_tool[2] = 'n'
+    # msg_tool[3] = 'g'
+
+    # # 信号量用法Semaphore
+    # msg_tool.acquire()
+    # print('P1 acquire lock!!!')
+
+    # Manager 用法
+    msg_tool['Ping'] = 'Pong'
+    down_fun(file_name)
+
+
+def down_two(file_name, msg_tool):
+    # # 管道用法
+    # print(f'P2 receive message {msg_tool.recv()}\n')
+
+    # # 消息队列用法
+    # print(f'P2 get message {msg_tool.get(block=True)}')
+
+    # 共享内存用法 Value、Array
+    # print(f'P2 get value {msg_tool.value}')
+    # print(f'P2 get value {msg_tool[:]}')
+
+    # # 信号量用法
+    # msg_tool.release()
+    # print('P2 release lock!!!')
+
+    # Manager用法
+    print(f'P2 read manager info {msg_tool}')
+    down_fun(file_name)
+
+
+def main():
+    _start_time = time.time()
+    # # 管道用法
+    # _msg = Pipe()
+    # _p1 = Process(target=down_one, args=('sea1.png', _msg[0],))
+    # _p2 = Process(target=down_two, args=('sea2.png', _msg[1],))
+
+    # # 消息队列用法
+    # _msg = Queue(maxsize=5)
+
+    # # 共享内存 Value（单个数字或者字符）、Array（数组要求每个元素类型相同）
+    # _msg = Value(typecode_or_type='u')
+    # _msg = Array(typecode_or_type='u', size_or_initializer=10)
+
+    # # 信号量用法 Semaphore，参数控制并发数
+    # _msg = Semaphore(1)
+
+    # Manager 可以使用List、Dict、Value、Array、Semaphore等
+    _msg = Manager().dict()
+
+    _p1 = Process(target=down_one, args=('sea1.png', _msg,))
+    _p2 = Process(target=down_two, args=('sea1.png', _msg,))
+
+    _p1.start()
+    _p2.start()
+    _p1.join()
+    _p2.join()
+    print(f'总耗时：{time.time() - _start_time}\n')
+
+
+if __name__ == '__main__':
+    main()
+
+```
+
 ##### 多线程（CPU调度的最小单元）
 
-###### 线程间通信（直接共享内存了，加锁方式）
+###### 线程间通信（直接共享内存了，加锁方式、或者使用queue）
 - threading.Lock()：基本锁对象，每次只能锁一次，其余锁请求需等待锁释放后才能获取
 - threading.Rlock()：可重入锁，可多次锁定多次释放，acquire和release成对出现即可
 - threading.Condition()：acquire、release和Lock一样，但提供wait()（挂起）、notify(n)（对多唤醒n和线程）、notifyAll(唤醒所有wait线程)
