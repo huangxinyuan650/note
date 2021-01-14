@@ -359,6 +359,50 @@ class C(object):
         return getattr(C, '_instance')
 ```
 
+#### concurrent、asyncio
+##### Futures
+- done()，都不阻塞么，返回任务是否执行完成的布尔值
+- add_done_callback()，传入可调用对象，当任务执行完成时调用
+- result()，阻塞等待任务执行完成，concurrent中可传入timeout参数，asyncio.Futures不阻塞当未完成时抛出asyncio.InvalidStateError异常（建议用yield from futures）
+
+##### asyncio
+###### 可等待对象（协程、任务、Future）
+- 协程函数：定义形式为 async def 的函数
+- 协程对象：调用协程函数所返回的对象
+###### 运行协程机制
+- asyncio.run(coroutine)：接收一个协程并直接运行，管理asyncio事件循环、终结异步生成器、并关闭线程池（当有其他asyncio事件循环在同一线程中使用时此函数不可用）
+- await：等待一个协程。创建一个协程对象后，await coroutine。
+- asyncio.create_task(coroutine)：接受一个协程创建一个task准备执行并返回Task对象。
+- asyncio.gather(*aws,loop=None,return_exceptions=False)：aws为可等待对象序列，并发运行多个协程，返回结果。（单个协程的执行异常或者取消不影响其他协程，若gather被取消则为执行完成的协程将被取消）
+- asyncio.shield(aw,*,loop=None)：保护一个可等待对象防止被取消。
+- asyncio.wait_for(aw,timeout,*,loop=None)：等待可等待对象aw执行完成，超过timeout后超时。（超时取消任务）
+- asyncio.wait(aws,*,loop=None,time_out=None,return_when=ALL_COMPLETED)：并发运行可迭代对象aws中的可等待对象并进入阻塞状态直到满足return_when条件，返回结果为(done,pending)的task/future集合。（return_when参数为FIRST_COMPLETED、FIRST_EXCEPTION、ALL_COMPLETED，超时不取消任务）
+- asyncio.as_completed(aws,*,loop=None,time_out=None)：并发运行可迭代对象aws中的可等待对象，返回一个协程的迭代器。
+- asyncio.to_thread(func,/,*xargs,**kwargs)：在不同的线程中运行函数func，返回一个可获取func执行结果的协程。
+
+###### 其他方法
+- asyncio.current_task(loop=None)：获取当前运行的task实例。
+- asyncio.all_tasks(loop=None)：返回事件循环所运行的所有未完成的任务实例对象集合。
+
+###### Task使用说明
+- 通过asyncio.create_task、loop.create_task、ensure_future等方法可创建task对象
+- cancel(msg=None):是task对象抛出一个CancelledError异常给打包的协程。
+- cancelled()：检测task对象是否已经被取消。
+- done():判断一个task是否执行完成。
+- result()：返回task返回结果。
+- exception()：返回task执行异常。
+- add_done_callback(callback,*,context=None)：添加一个任务完成式的回调。
+- remove_done_callback(callback)：移除为任务添加的回调。
+- get_coro()：返回task包装的协程对象。
+- get_name()：返回task对象name。
+- set_name(value)：设置task对象名称。
+
+####### 基于生成器的协程
+使用@asyncio.coroutine装饰的使用yield from语法的生成器，可等待future和其他协程
+- asyncio.iscoroutine(obj)：判断obj是否为协程对象。
+- asyncio.iscoroutinefunction(func)：判断func是否为协程函数。
+
+
 #### 分布式锁
 多进程、多线程均可通过锁来处理临界资源的竞争问题，但当使用集群时，多机针对临街资源的竞争需要使用分布式锁来完成
 ##### 实现方式
