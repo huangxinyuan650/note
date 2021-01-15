@@ -415,21 +415,21 @@ Web Server Gateway Interface，指定了Web服务器到PythonWeb应用之间的�
 ##### WSGI规定格式
 WSGI规定Web程序必须有一个可调用对象且该可调用对象接收两个参数，返回一个可迭代对象。
 - environ：dict，包含请求的所有信息。
-- start_response：在可调用对象中调用的函数，用来发起响应，参数包括状态码、响应头等。
+- start_response：在可调用对象中调用的函数，用来处理响应，参数包括状态码、响应头等。（主要处理状态码和header）
 ##### WSGI服务器代码启动说明
 - WSGIServer-->HTTPServer-->socketserver.TCPServer-->BaseServer
 - WSGIRequestHandler-->BaseHTTPRequestHandler-->socketserver.StreamRequestHandler-->BaseRequestHandler
 - ServerHandler-->SimpleHandler-->BaseHandler-->
 ---
-- WSGIServer实例化，传入套接字所需IP、Port和handler处理类WSGIRequestHandler到init方法
-- TCPServer中的init：先调BaseServer的init方法注册了server_address、RequestHandlerClass(WSGIRequestHandler)等属性，然后创建socket套接字并绑定端口设置request_queue_size为5后开始socket监听。
-- WSGIServer实例调用set_app方法：传入app（处理请求方法）
-- WSGIServer实例启动服务：wsgi_server.serve_forever()，开始监听READ事件，当请求到达时通过_handle_request_noblock方法处理请求。
-- _handle_request_noblock方法：先get_request获取请求来的套接字，再verify_request方法验证请求，然后process_request方法处理请求，process_request方法会调finish_request方法
-- finish_request方法：调用WSGIRequestHandler处理请求，传入request、client_address、self(WSGIServer实例)
-- WSGIRequestHandler：调用init方法(BaseRequestHandler)实例化，接收request、client_address、WSGIServer实例并注册成实例属性，并调用setup方法(StreamRequestHandler)创建连接文件等，然后调用handle方法(WSGIRequestHandler)
-- handle_one_request方法：通过parse_request方法解析请求，然后传入self.rfile、self.wfile、sys.stderr、environ到ServerHandler创建ServerHandler实例(SimpleHandler的init，默认多线程multithread为true)，并将ServerHandler实例的request_handler设置为WSGIRequestHandler的实例，然后传入app名称调用run方法(BaseHandler)处理请求
-- run方法(BaseHandler)：调用setup_environ方法注入环境变量（请求信息等），传入environ和start_response调用app方法来实际处理请求，处理完成后并调用finish_response方法处理结果
+- 1、WSGIServer实例化，传入套接字所需IP、Port和handler处理类WSGIRequestHandler到init方法
+- 2、TCPServer中的init：先调BaseServer的init方法注册了server_address、RequestHandlerClass(WSGIRequestHandler)等属性，然后创建socket套接字并绑定端口设置request_queue_size为5后开始socket监听。
+- 3、WSGIServer实例调用set_app方法：传入app（处理请求方法）
+- 4、WSGIServer实例启动服务：wsgi_server.serve_forever()，开始监听READ事件，当请求到达时通过_handle_request_noblock方法处理请求。
+- 5、_handle_request_noblock方法：先get_request获取请求来的套接字，再verify_request方法验证请求，然后process_request方法处理请求，process_request方法会调finish_request方法
+- 6、finish_request方法：调用WSGIRequestHandler处理请求，传入request、client_address、self(WSGIServer实例)
+- 7、WSGIRequestHandler：调用init方法(BaseRequestHandler)实例化，接收request、client_address、WSGIServer实例并注册成实例属性，并调用setup方法(StreamRequestHandler)创建连接文件等，然后调用handle方法(WSGIRequestHandler)
+- 8、handle方法：通过parse_request方法解析请求，然后传入self.rfile、self.wfile、sys.stderr、environ到ServerHandler创建ServerHandler实例(SimpleHandler的init，默认多线程multithread为true)，并将ServerHandler实例的request_handler设置为WSGIRequestHandler的实例，然后传入app名称调用run方法(BaseHandler)处理请求
+- 9、run方法(BaseHandler)：调用setup_environ方法注入环境变量（请求信息等），传入environ和start_response调用app方法来实际处理请求，处理完成后并调用finish_response方法处理结果
 ```
 # _*_ coding:utf-8_*_
 # Author:   Ace Huang
