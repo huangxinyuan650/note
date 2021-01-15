@@ -410,6 +410,54 @@ class C(object):
 - Redis：使用setnx命令（原子操作，成功返回1，失败返回0）申请锁，申请成功后操作资源，操作完成后删除key。（可使用expire命令设置获取锁使用时间，超时无效）
 - zookeeper：
 
+#### WSGI
+Web Server Gateway Interface，指定了Web服务器到PythonWeb应用之间的标准接口，以提高Web应用在一系列Web服务器间的移植性。（web请求处理过程：浏览器发出请求-->Web服务器-->Web应用程序-->Web服务器-->浏览器）
+##### WSGI规定格式
+WSGI规定Web程序必须有一个可调用对象且该可调用对象接收两个参数，返回一个可迭代对象。
+- environ：dict，包含请求的所有信息。
+- start_response：在可调用对象中调用的函数，用来发起响应，参数包括状态码、响应头等。
+##### WSGI服务器代码启动说明
+- WSGIServer-->HTTPServer-->socketserver.TCPServer-->BaseServer
+- WSGIRequestHandler-->BaseHTTPRequestHandler-->socketserver.StreamRequestHandler-->BaseRequestHandler
+- ServerHandler-->SimpleHandler-->BaseHandler-->
+---
+- WSGIServer实例化，传入套接字所需IP、Port和handler处理类WSGIRequestHandler到init方法
+- TCPServer中的init：先调BaseServer的init方法注册了server_address、RequestHandlerClass(WSGIRequestHandler)等属性，然后创建socket套接字并绑定端口设置request_queue_size为5后开始socket监听。
+- WSGIServer实例调用set_app方法：传入app（处理请求方法）
+- WSGIServer实例启动服务：wsgi_server.serve_forever()，开始监听READ事件，当请求到达时通过_handle_request_noblock方法处理请求。
+- _handle_request_noblock方法：先get_request获取请求来的套接字，再verify_request方法验证请求，然后process_request方法处理请求，process_request方法会调finish_request方法
+- finish_request方法：调用WSGIRequestHandler处理请求，传入request、client_address、self(WSGIServer实例)
+- WSGIRequestHandler：调用init方法(BaseRequestHandler)实例化，接收request、client_address、WSGIServer实例并注册成实例属性，并调用setup方法(StreamRequestHandler)创建连接文件等，然后调用handle方法(WSGIRequestHandler)
+- handle_one_request方法：通过parse_request方法解析请求，然后传入self.rfile、self.wfile、sys.stderr、environ到ServerHandler创建ServerHandler实例(SimpleHandler的init，默认多线程multithread为true)，并将ServerHandler实例的request_handler设置为WSGIRequestHandler的实例，然后传入app名称调用run方法(BaseHandler)处理请求
+- run方法(BaseHandler)：调用setup_environ方法注入环境变量（请求信息等），传入environ和start_response调用app方法来实际处理请求，处理完成后并调用finish_response方法处理结果
+```
+# _*_ coding:utf-8_*_
+# Author:   Ace Huang
+# Time: 2021/1/15 09:37
+# File: Application.py
+from wsgiref.simple_server import make_server
+
+
+def hello(environ, start_response):
+    status = '200 OK'
+    response_headers = [('Content-Type', 'text/html')]
+    start_response(status, response_headers)
+    path = environ.get('PATH_INFO') and environ['PATH_INFO'][1:] or 'hello'
+    return [f'<h1>{path}</h1>'.encode()]
+
+
+def main():
+    server = make_server(host='127.0.0.1', port=2650, app=hello)
+    print('Start listening...')
+    server.serve_forever()
+
+
+if __name__ == '__main__':
+    main()
+
+```
+
+
 #### 简易HttpServer
 ```
 # _*_ coding:utf-8_*_
