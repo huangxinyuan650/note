@@ -457,6 +457,59 @@ if __name__ == '__main__':
 
 ```
 
+#### Tornado
+##### tornado.ioloop.IOLoop.instance().start()说明
+- tornado.ioloop.IOLoop.instance()会返回一个IOLoop实例
+- IOLoop实例的start方法会调用run_forever方法
+- run_forever方法中在设置一些设置后会进入一个死循环，循环中调用_run_once方法
+- _run_once方法通过selector的select方法获取文件事件（阻塞等待监听的请求句柄文件的读或者写事件发生，self._selector.control方法会阻塞）
+- _run_once方法获取到文件事件后取消阻塞接着开始处理scheduled中的事件，然后开始处理ready队列中的事件（请求）
+- 处理ready中的请求时会携带上下文和对应的handler，然后调用handler的_execute方法，_execute方法会根据请求类型调用handler对应的方法（prepare、finish等方法的逻辑在_execute方法中）
+```
+# _*_ coding:utf-8_*_
+# Author:   Ace Huang
+# Time: 2021/1/15 09:37
+# File: Application.py
+
+from tornado.web import Application
+from tornado.ioloop import IOLoop
+from tornado import httpserver
+from tornado.options import options, define
+import logging
+import os
+from test.TestDemoRequestHandler import TestDemoRequestHandler, DemoRequestHandler
+
+logging.basicConfig(level=logging.INFO)
+
+define(name='port', default=2650, type=int, help='Default Server Port')
+options.parse_command_line()
+
+
+def main():
+    """
+    1、引入SqlAlchemy
+    2、引入Redis
+    3、增加读写分离
+    4、增加分区分表
+    5、自动加载指定目录下的指定RequestHandler
+    :return:
+    """
+    _application = Application(
+        handlers=[
+            (r'/(wengen|model)/test', TestDemoRequestHandler),
+            (r'/(test|ceshi)/test', DemoRequestHandler),
+        ],
+        template_path=os.path.join(os.path.dirname(__file__), 'template'))
+    _http_server = httpserver.HTTPServer(_application, xheaders=True)
+    _http_server.listen(options.port)
+    logging.info(f'Server is listening port:{options.port}')
+    IOLoop.instance().start()
+
+
+if __name__ == '__main__':
+    main()
+
+```
 
 #### 简易HttpServer
 ```
