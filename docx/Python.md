@@ -464,7 +464,7 @@ if __name__ == '__main__':
 - run_forever方法中在设置一些设置后会进入一个死循环，循环中调用_run_once方法
 - _run_once方法通过selector的select方法获取文件事件（阻塞等待监听的请求句柄文件的读或者写事件发生，self._selector.control方法会阻塞）
 - _run_once方法获取到文件事件后取消阻塞接着开始处理scheduled中的事件，然后开始处理ready队列中的事件（请求）
-- 处理ready中的请求时会携带上下文和对应的handler，然后调用handler的_execute方法，_execute方法会根据请求类型调用handler对应的方法（prepare、finish等方法的逻辑在_execute方法中）
+- 处理ready中的请求时会携带上下文和对应的handler(通过application的call方法调用find_handler然后根据request的uri去和rules匹配)，然后调用handler的_execute方法，_execute方法会根据请求类型调用handler对应的方法（prepare、finish等方法的逻辑在_execute方法中）
 ```
 # _*_ coding:utf-8_*_
 # Author:   Ace Huang
