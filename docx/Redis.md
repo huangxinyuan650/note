@@ -140,8 +140,10 @@ struct redisClient {
 每隔一段时间对数据库进行检查并删除其中的过期键（删除多少过期键和检查几个数据库由算法决定）
 ##### 内存淘汰策略 maxmemory-policy
 - Noeviction：当内存不足以容纳新key时，新写入操作报错
-- Allkeys-lru：当内存不足时，在键空间中移除最近最少未使用的key
+- Allkeys-lru：当内存不足时，在键空间中移除最近最久未使用（事件）的key
+- Allkeys-lfu：当内存不足时，在键空间中移除最近最少未使用（频率）的key
 - Allkeys-random：当内存不足时，在键空间中随机删除某个key
+- Volatile-lru：当内存不足时，在设置了过期时间键空间中删除最近最久未使用的key
 - Volatile-lru：当内存不足时，在设置了过期时间键空间中删除最近最少未使用的key
 - Volatile-random：当内存不足时，在设置了过期时间键空间中随机删除一个key（有更早过期的key优先删除）
 - Volatile-ttl：当内存不足时，在设置了过期时间键空间中删除更早过期的key

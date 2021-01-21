@@ -17,10 +17,10 @@ Ws.send()使用连接发送数据
 Ws.close()关闭连接
 ### 三. 服务端端调用方法(tornado)
 Tornado提供支持WebSocket的模块是tornado.websocket，其中提供了一个WebSocketHandler类用来处理通讯。
-1. Websockethandler.open():当一个websocket连接建立后被调用
-2. Web.sockethandler.on_message(message):当客户端发动消息过来时被调用,此方法必须被重写
-3. -Web.sockethandler.on_close():当websocket连接关闭后被调用
-4. Websockethandle.write_message(message,binary= False): 向客户端发送消息messagea，message可以是字符串或字典（字典会被转为json字符串）。若binary为False，则message以utf8编码发送；二进制模式（binary=True）时，可发送任何字节码。
-5. Websockethandler.close():关闭websocket连接
+1. WebSocketHandler.open():当一个websocket连接建立后被调用
+2. WebSocketHandler.on_message(message):当客户端发动消息过来时被调用,此方法必须被重写
+3. WebSocketHandler.on_close():当websocket连接关闭后被调用
+4. WebSocketHandler.write_message(message,binary= False): 向客户端发送消息messagea，message可以是字符串或字典（字典会被转为json字符串）。若binary为False，则message以utf8编码发送；二进制模式（binary=True）时，可发送任何字节码。
+5. WebSocketHandler.close():关闭websocket连接
 6. WebSocketHandler.check_origin(origin)：判断源origin，对于符合条件（返回判断结果为True）的请求源origin允许其连接，否则返回403。可以重写此方法来解决WebSocket的跨域请求（如始终return True）。
 注意：WebSocket可以共用Http对端口的监听和路由的配置。
