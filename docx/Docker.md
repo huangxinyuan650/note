@@ -1,36 +1,55 @@
 ## Docker
 
 ### 网络原理说明
-docker0作为一个网桥（网关）处于容器veth与容器veth以及容器veth和宿主机网卡之间
+docker0作为一个网桥（网关）处于容器veth(eth0)与容器veth(eth0)以及容器veth(eth0)和宿主机网卡之间
+#### 网络模式
+- Host：无独立IP，和宿主机共用一个网络ns，和宿主机同IP
+- Container：和关联的一个已经存在的容器共享一个网络ns
+- None：关闭容器网络功能。（在只进行写磁盘的批处理等场景可用）
+- Bridge：NAT模式，容器拥有独立的网络ns，并连接到docker0虚拟网卡上，通过docker0网桥和iptables nat表配置与宿主机通信(docker inspect container_name中的NETWORKS信息即为容器的网络信息)
 
-**docker安装**
-1. 清除之前安装的
+#### Flannel
+flannel实际上是一种覆盖网络（overlay network）就是将TCP数据包装在另一个网络包中进行路由转发和通信，让集群中每个节点的docker容器都具有一个全集群唯一的虚拟IP。（docker0每个节点的子网网段可能相同）
+- 跨主机网络路径：ContainerA eth0 -> Node1 docker0 -> Node1 flannel0(将请求封成UDP包，并通过ETCD查到目的容器所属节点的地址) -> Node2 flannel0(将请求UDP包解包并转发到docker0) -> Node2 docker0 -> ContainerB eth0
+- ETCD：存储并维护了一张节点间路由表
+
+### Docker安装
+- 1. 清除之前安装的
+```
 sudo apt-get remove docker docker-engine docker.io
-2. 更新系统库
+```
+- 2. 更新系统库
+```
 sudo apt-get update
-3. 安装curl等工具
+```
+- 3. 安装curl等工具
+```
 sudo apt-get install \
     apt-transport-https \
     ca-certificates \
     curl \
     software-properties-common
-4. 添加镜像源key
+```
+- 4. 添加镜像源key
+```
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo apt-key fingerprint 0EBFCD88
-5. 添加镜像源
+```
+- 5. 添加镜像源
+```
 sudo add-apt-repository \
    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
    $(lsb_release -cs) \
    stable"
 sudo apt-get update
-6. 安装docker-ce
+```
+- 6. 安装docker-ce
+```
 sudo apt-get install docker-ce
-7. 再安装docker-compose
+```
+- 7. 再安装docker-compose
+```
 sudo apt-get install docker-compose
-
-**指定yaml文件后台启动镜像**
-```Shell
-docker-compose -f office_compose.yaml up -d
 ```
 
 **打印镜像，过滤指定镜像，过滤掉最新2个镜像外，只打印镜像ID,逐个删除镜像** 
@@ -54,6 +73,7 @@ docker images | grep 'Name' | tail -n +3 | awk '{print $3}' | xargs docker rmi
 * [ ] docker search 查询官方库中的响应镜像并通过docker pull进行拉取
 * [ ] docker tag imageName/imageID [registryhost] [username/]imageName:tagName 将镜像打标签
 * [ ] docker logs 查看日志信息
+* [ ] docker inspect containerName 查看容器信息
 * [ ] docker port 查看绑定的IP和端口
 * [ ] docker save -o fileName imageName:version 保存指定镜像到指定文件
 * [ ] docker load --input fileName 从文件中恢复镜像到本地库

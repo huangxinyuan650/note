@@ -73,3 +73,9 @@
 
 ##### 一个域名绑定多个IP
 查询一个域名绑定的IP，nslookup domain
+
+- DNS：dig +trace domain
+
+#### 其他
+- Ping：ICMP协议，处于网络层，通过发送回送请求报文和回送回答报文
+- traceroute domain：想目标地址发送udp报文，判断路径

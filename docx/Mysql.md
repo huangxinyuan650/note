@@ -295,6 +295,24 @@ select * from table_name where  field = 1 for update
 - 1、master将更新操作记录到二进制日志文件
 - 2、slave将二进制文件拷贝至记的relay log（中继日志）文件中（slave开始一个工作线程在master上打开一个普通的连接，然后开始binlog dump process从master的binlog中读取事件并写入到relay log中，若已保持同步则休眠等待master新的事件）
 - 3、slave线程开始读取relay log中的事件并串行开始执行来更新从库中的数据保持与主库一致。（relay log通常位于系统缓存中所以开销较小）
+#### 全同步复制、异步复制、半同步复制
+- 全同步复制：当master提交事务后，需等到所有slave事务都执行成功后才将结果返回给客户端。（实时、慢）
+- 异步复制：master只管将事件写入binlog日志并提交事务，不管slave是否接收处理完成。（快，不稳）
+- 半同步：当master提交事务后，至少等待一个slave事务执行成功返回再将结果返回给客户端。
+
+
+### 优化
+#### 影子拷贝
+用要求的表结构创建一张和源表无关的新表，然后通过重命名和山表操作交换两张表
+
+#### limit优化
+```
+# 原sql
+select field_name1,field_name2 from table_name limit 50,5;将会查询出55条数据然后返回最后5条
+# 优化后sql
+select filed_name1,field_name2 from table_name inner join (select field_name1 from table_name limit 50,5) as table2 using(field_name1);尽量减少扫表次数
+```
+
 
 ### 性能优化
 #### 单条查询剖析（show profile）
@@ -311,3 +329,4 @@ select * from table_name where  field = 1 for update
  * [ ] 修改表的Engine，alter table table_name ENGINE=EngineName
  * [ ] 插入查询sql(映射与字段顺序有关字段名无关)，insert into table_name1(field1,field2,...) select field_a,field_b,... from table_name2;
  * [ ] 更新查询，update table1 set table1.field_1 = table2.filed_a from table1,table2 where table1.field2=table2.field_b;
+ * [ ] limit，select * from table_name limit offset(start from 0),len;
