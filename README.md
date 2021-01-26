@@ -1,6 +1,7 @@
 ### 知识清单
 #### Language
 - [Python](docx/Python.md)
+- [Golang](docx/Go.md)
 - [Java](docx/Java.md)
 - [Js](docx/Js.md)
 
@@ -35,6 +36,7 @@
 - [先序遍历、中序遍历、后序遍历](docx/TreeView.md)
 - [深度优先、广度优先](docx/GraphView.md)
 - [最小树](docx/Minitree.md)
+- [布隆过滤器](docx/Minitree.md)
 
 #### 设计模式 Design Pattern
 - [单例](docx/SinglePattern.md)

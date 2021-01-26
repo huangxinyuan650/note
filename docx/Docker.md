@@ -8,10 +8,22 @@ docker0作为一个网桥（网关）处于容器veth(eth0)与容器veth(eth0)�
 - None：关闭容器网络功能。（在只进行写磁盘的批处理等场景可用）
 - Bridge：NAT模式，容器拥有独立的网络ns，并连接到docker0虚拟网卡上，通过docker0网桥和iptables nat表配置与宿主机通信(docker inspect container_name中的NETWORKS信息即为容器的网络信息)
 
+### CNI（container network interface）
+- overlay network：建立在现有网络上的虚拟网络
+- BGP：边界网关协议，用于管理边缘路由器间数据包的路由方式。
+- VXLAN：覆盖网络协议，可运行在现有网络之上，通过在UDP包中封装第二层以太网帧来帮助实现大型云部署
 #### Flannel
-flannel实际上是一种覆盖网络（overlay network）就是将TCP数据包装在另一个网络包中进行路由转发和通信，让集群中每个节点的docker容器都具有一个全集群唯一的虚拟IP。（docker0每个节点的子网网段可能相同）
+flannel实际上是一种配置在第三层的覆盖网络（overlay network）就是将TCP数据包装在另一个网络包中进行路由转发和通信，让集群中每个节点都有一个子网且节点的docker容器都具有一个全集群唯一的虚拟IP。（docker0每个节点的子网网段可能相同）
 - 跨主机网络路径：ContainerA eth0 -> Node1 docker0 -> Node1 flannel0(将请求封成UDP包，并通过ETCD查到目的容器所属节点的地址) -> Node2 flannel0(将请求UDP包解包并转发到docker0) -> Node2 docker0 -> ContainerB eth0
 - ETCD：存储并维护了一张节点间路由表
+#### Calico
+Calico是配置在第三层网络采用BGP（边界网关协议）路由协议在主机之间路由数据包而无需再打包数据包。
+- 优点：性能快（节点间路由无需再打包数据包）、异常排查（无需打包数据包，排查简单）、网络功能（设置负载等，与lstio继承）
+#### Canal
+Flannel与Calico的组合，网络层使用Flannel的覆盖网络，网络规则、流量控制使用Calico
+#### Weave
+在集群中每个节点中创建网状overlay network，通过各节点上的路由组件维护可用网络最新视图，当需要将流量发送到位于不同节点上的pod时weave路由组件会自动决定是采用快速数据路径发送还是回退到sleeve分组转发的方式
+- 独有优点：对整个网络简单加密
 
 ### Docker安装
 - 1. 清除之前安装的

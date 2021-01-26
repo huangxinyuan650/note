@@ -330,3 +330,4 @@ select filed_name1,field_name2 from table_name inner join (select field_name1 fr
  * [ ] 插入查询sql(映射与字段顺序有关字段名无关)，insert into table_name1(field1,field2,...) select field_a,field_b,... from table_name2;
  * [ ] 更新查询，update table1 set table1.field_1 = table2.filed_a from table1,table2 where table1.field2=table2.field_b;
  * [ ] limit，select * from table_name limit offset(start from 0),len;
+ * [ ] DDL（数据定义语言，操作表等）、DML（数据操作语言，操作记录）、DCL（数据控制语言，针对用户授权等）
