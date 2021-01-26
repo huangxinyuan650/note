@@ -16,6 +16,7 @@ docker0作为一个网桥（网关）处于容器veth(eth0)与容器veth(eth0)�
 flannel实际上是一种配置在第三层的覆盖网络（overlay network）就是将TCP数据包装在另一个网络包中进行路由转发和通信，让集群中每个节点都有一个子网且节点的docker容器都具有一个全集群唯一的虚拟IP。（docker0每个节点的子网网段可能相同）
 - 跨主机网络路径：ContainerA eth0 -> Node1 docker0 -> Node1 flannel0(将请求封成UDP包，并通过ETCD查到目的容器所属节点的地址) -> Node2 flannel0(将请求UDP包解包并转发到docker0) -> Node2 docker0 -> ContainerB eth0
 - ETCD：存储并维护了一张节点间路由表
+- 优点：易安装和配置
 #### Calico
 Calico是配置在第三层网络采用BGP（边界网关协议）路由协议在主机之间路由数据包而无需再打包数据包。
 - 优点：性能快（节点间路由无需再打包数据包）、异常排查（无需打包数据包，排查简单）、网络功能（设置负载等，与lstio继承）
