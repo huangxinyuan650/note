@@ -33,6 +33,7 @@
 - [冒泡排序](docx/BubbleSort.md)
 - [选择排序](docx/BubbleSort.md)
 - [快速排序](docx/BubbleSort.md)
+- [插入排序](docx/BubbleSort.md)
 - [先序遍历、中序遍历、后序遍历](docx/TreeView.md)
 - [深度优先、广度优先](docx/GraphView.md)
 - [最小树](docx/Minitree.md)

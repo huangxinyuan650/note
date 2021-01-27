@@ -10,6 +10,9 @@ class BooSort(object):
 
     @staticmethod
     def sort(_list: list) -> list:
+        """
+        可优化，当某次冒泡不再出现交换操作时说明数据已经有序即可跳出排序
+        """
         def swap(n):
             _list[n - 1], _list[n] = _list[n], _list[n - 1]
 
