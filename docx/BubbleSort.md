@@ -96,12 +96,33 @@ class QuickSort(object):
         quick_sort(0, len(_list) - 1)
         return _list
 
+class InsertSort(object):
+
+    def sort(self, nums: list) -> list:
+        """
+        插入排序，初始状态第一个数为有序区，其余为无需区，然后从无序区一个个插入到有序区
+        """
+        if len(nums) <= 1:
+            return nums
+        for _ in range(1, len(nums)):
+            _tmp = nums[_]
+            while _ > 0:
+                if nums[_ - 1] > _tmp:
+                    nums[_] = nums[_ - 1]
+                    _ -= 1
+                else:
+                    break
+            nums[_] = _tmp
+        return nums
+
 
 _s1 = BooSort()
 _s2 = ChooseSort()
 _s3 = QuickSort()
+_s4 = InsertSort()
 print(_s1.sort([7, 4, 8, 4, 9, 3, 1, 1, 0, 4, 6, 8]))
 print(_s2.sort([7, 4, 8, 4, 9, 3, 1, 1, 0, 4, 6, 8]))
 print(_s3.sort([7, 4, 8, 4, 9, 3, 7, 1, 1, 0, 4, 6, 8]))
+print(_s4.sort([7, 4, 8, 4, 9, 3, 7, 1, 1, 0, 4, 6, 8]))
 
 ```
