@@ -66,6 +66,15 @@ Mysql主要由Server层和存储引擎层组成，Server层又分为连接器、
 #### 全文索引
 查找文中关键字
 
+#### change buffer
+通过innodb_change_buffer_max_size设置change buffer占用buffer pool的占比，change buffer是当要更新数据时使用普通索引的页未在内存中找到，此时在不影响数据一致性的情况下innodb会将更新操作保存到change buffer中，待到下一次查询相关页的数据时从磁盘读取到内存然后和change buffer中的数据merge或者系统的后台线程会定期merge change buffer中的内容到磁盘
+- 使用场景：针对写多读少且更新完不立马读的场景，变更都发生在change buffer大大减少了磁盘IO
+- change buffer merge过程：1、从磁盘中读取数据页到内存 2、从change buffer中找出该数据页的change buffer内容依次应用得到新数据页 3、将数据变更和change buffer变更写入redo log（刷入磁盘非merge操作内容）
+
+#### sort by
+sort by的过程为，先创建sort buffer，然后查询出所有待排序字段放到sort buffer中，进行快排然后返回结果。（若待排序数据量超过sort buffer size则需借助磁盘临时文件协助排序）
+- sort buffer size越小，使用的外部文件数就越多，将待排序数据分成若干份，每份大小为sort buffer size，然后采用归并排序形成最后结果
+
 ### 事务
 #### 四大特性
 - 原子性（Atomicity），事物要么全做要么全不做（回滚时使用undolog）

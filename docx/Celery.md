@@ -47,4 +47,21 @@ Celery beat -A celery_app
 
 ### [更详细信息直接参考官方文档](http://docs.jinkan.org/docs/celery/getting-started/introduction.html)
 
+## 消息队列
+- 可靠性保证
+- 持久化
+- 广播模式
+- 延时队列：使用zset实现，到期时间戳为score排序，轮询zset确认是否有到期消息需要处理
+### Redis
+#### list
+使用LPUSH向队列发消息，BRPOPLPUSH（可以支持等待超时时间和存储取出后的消息来做持久化）来消费并备份消息
+#### pub/sub
+使用publish向队列发送消息，使用psubscribe订阅特定模式消息（消息无法持久化、无法收到历史消息）
+#### [stream](./Redis.md)
+- 生产者：使用xadd来向队列发送消息
+- 消费者：使用xread从消息队列中读取消息（可block、可读历史消息，可读最新消息）
+
+### RabbitMQ
+
+
 

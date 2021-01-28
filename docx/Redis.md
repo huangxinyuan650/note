@@ -3,7 +3,7 @@
 - 1、纯内存操作
 - 2、单线程操作，避免频繁切换上下文
 - 3、采用非阻塞I/O多路复用机制
-#### 布隆过滤器
+#### [布隆过滤器](./Minitree.md)
 
 #### 持久化
 原因：服务器宕机等因素会导致内存数据丢失
@@ -205,6 +205,24 @@ struct sdshdr{
 ###### 数据结构（ziplist或者skiplist）
 当有序集合元素数量小于128个且元素成员长度都小于64字节采用ziplist否则采用skiplist（zset-max-ziplist-entries、zset-max-ziplist-value）
 ziplist结构（\[元素1成员、元素1分值、元素2成员、元素2分值、...\]）按分值由小到大存储
+
+##### Stream(流)
+- xadd key [MAXLEN [~|=] <count>] <ID|*> [field1 value1] [field2 value2]... (设置流信息，maxlen用于裁剪流大小)
+- xrange key startID endID [COUNT count] （获取流消息，startID('-'为最小)、endID('+'为最大)为消息的范围ID）
+- xrevrange key endID startID [COUNT count] (获取消息，逆序返回)
+- xdel key IDS (删除消息中指定ID的数据，可多个ID)
+- xgroup create key groupName id-or-$ (为指定key创建一个新消费组，id为消费组开始消费的消息ID（$为最后一项ID）)
+- xgroup set key id-or-$ （修改指定消费组的消费的消息last_id）
+- xgroup destroy key groupName (删除指定消费组)
+- xgroup delconsumer key groupName consumerName (删除指定消费组中的指定消费者)
+- xreadgroup group consumer [COUNT count] [BLOCK milliseconds] streams key [key...] ID [id...] (读取消费组中的消息，ID数要与key对应,'>'为未传递给其他消费者的消息)
+- xread [COUNT count] [BLOCK milliseconds] streams key [key...] ID [id...] (读取消息队列中的消息)
+- xack key group ID [id...] (确认一个或多个消息，使其从待确认列表中删除)
+- xpending key group [start end count] [consumer] (获取某个消费组或者消费者未确认的消息)
+- xtrim key maxlen [~|=] count (裁剪消息队列的大小，～为模糊裁剪、=为精确裁剪)
+- xlen key (获取消息队列的长度)
+
+
 
 
 #### 事件
