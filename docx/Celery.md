@@ -62,6 +62,25 @@ Celery beat -A celery_app
 - 消费者：使用xread从消息队列中读取消息（可block、可读历史消息，可读最新消息）
 
 ### RabbitMQ
+#### 组成
+- Broker：标示消息队列服务器实体
+- Virtual Host（虚拟主机）：用于标示一批交换机、消息队列和相关对象
+- Exchange（交换机）：接收消息生产者发送的消息并将消息根据路由规则转给服务器中的消息队列
+- Queue（消息队列）：存储消息并将消息发送给消费者
+- Banding（绑定）：用于消息队列和交换机之间的关联
+- Channel（信道）：多路复用连接中一条双向连接的数据流通道（建立在TCP连接之上的虚链接开销较小，消息发布、订阅消息、接收消息都通过信道完成）。
+- Connection：网络连接
+- Publisher（消息的生产者）：向交换机发送消息的应用程序
+- Consumer（消息的消费者）：从消息队列中获取消息的应用程序
+- Message（消息）：消息是不具名的，有消息头和消息体组成
+- Bing key：消息队列接受的key
+- Routing key：消息携带的需要路由的key
+
+#### Exchange类型
+- fanout：将所有发给Exchange的消息都路由到所有绑定的Queue
+- direct：将消息的Routing Key与Queue的Bing Key完全匹配的消息路由到对应的Queue中
+- topic：将消息的Routing Key与Queue的Bing Key进行匹配（模糊匹配，Bing Key和Routing Key都是点号分隔的字符串，*匹配一个单词，#匹配零个或多个单词），匹配上的消息路由到对应的Queue中
+- header：根据消息中的headers属性与创建Exchange是设置的属性进行匹配，将匹配上的消息路由到对应的Queue中
 
 
 
