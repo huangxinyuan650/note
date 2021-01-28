@@ -59,7 +59,7 @@ Celery beat -A celery_app
 使用publish向队列发送消息，使用psubscribe订阅特定模式消息（消息无法持久化、无法收到历史消息）
 #### [stream](./Redis.md)
 - 生产者：使用xadd来向队列发送消息
-- 消费者：使用xread从消息队列中读取消息（可block、可读历史消息，可读最新消息）
+- 消费者：使用xread（xreadgroup）从消息队列中读取消息（可block、可读历史消息，可读最新消息、使用group还可以多个group订阅且消费会需要确认）
 
 ### RabbitMQ
 #### 组成

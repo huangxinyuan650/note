@@ -212,17 +212,18 @@ ziplist结构（\[元素1成员、元素1分值、元素2成员、元素2分值�
 - xrevrange key endID startID [COUNT count] (获取消息，逆序返回)
 - xdel key IDS (删除消息中指定ID的数据，可多个ID)
 - xgroup create key groupName id-or-$ (为指定key创建一个新消费组，id为消费组开始消费的消息ID（$为最后一项ID）)
-- xgroup set key id-or-$ （修改指定消费组的消费的消息last_id）
+- xgroup setid key groupName id-or-$ （修改指定消费组的消费的消息last_id）
 - xgroup destroy key groupName (删除指定消费组)
 - xgroup delconsumer key groupName consumerName (删除指定消费组中的指定消费者)
-- xreadgroup group consumer [COUNT count] [BLOCK milliseconds] streams key [key...] ID [id...] (读取消费组中的消息，ID数要与key对应,'>'为未传递给其他消费者的消息)
+- xreadgroup group consumer [COUNT count] [BLOCK milliseconds] streams key [key...] ID [id...] (消费消费组中的消息，ID数要与key对应,'>'为未传递给其他消费者的消息)
 - xread [COUNT count] [BLOCK milliseconds] streams key [key...] ID [id...] (读取消息队列中的消息)
 - xack key group ID [id...] (确认一个或多个消息，使其从待确认列表中删除)
 - xpending key group [start end count] [consumer] (获取某个消费组或者消费者未确认的消息)
 - xtrim key maxlen [~|=] count (裁剪消息队列的大小，～为模糊裁剪、=为精确裁剪)
 - xlen key (获取消息队列的长度)
-
-
+- xinfo [consumers key groupName] [groups key] [stream key] [help] （分别查询消息队列指定的group下的消费者、消费队列下的group、消息队列下的消息信息）
+- 备注：xadd命令往消息队列中增加消息，然后通过xreadgroup命令消费消息，消费完成后通过xack命令确认消费完成，但以上操作均不会删除消息队列中的消息，只有在确认所有group和consumer消费完成后再执行xdel命令删除已经消费的消息
+###### stream实现消息队列
 
 
 #### 事件
