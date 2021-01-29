@@ -173,7 +173,9 @@ typedef struct redisObject {
 } robj;
 ```
 
+#### Redis使用的数据结构
 ##### 字符串（String）
+- sds和直接使用c字符串的区别：1、sds可以直接获取字符串长度（len属性） 2、sds在合并前会自动分配足够的内存避免溢出 3、sds通过内存预分配等减少操作时内存重新分配（free属性）
 ###### 数据结构
 ```
 struct sdshdr{
@@ -183,14 +185,52 @@ struct sdshdr{
 }
 ```
 字符串扩展原则：小于1M，则free长度等于扩展长度，大于1M的free长度等于1M
+
+##### 链表（LinkedList）
+redis中的链表为双端链表，数据结构中还有链表长度等
+
+##### 字典（dict）
+redis中字典的数据结构是使用hashtable实现，其中存储数据的为一个长度为2的hashtable数组，ht[0]用来存储数据，ht[1]在rehash的时候使用
+- 字典的冲突解决方式使用的是拉链法，在每个entry数据结构中都有一个next指针
+- rehash操作：1、ht[1]分配空间（大小为ht[0].used*2^n）2、将ht[0]所有元素rehash到ht[1] 3、将ht[1]赋值给ht[0]并将ht[1]设置为null
+- 渐进式rehash：分配好ht[1]的空间后，每次的查找、更新操作都会在ht[0]上先操作，然后在迁到ht[1]上，删除操作则直接在ht[0]上删除，增加操作在ht[1]上完成
+
+##### 跳跃表（skiplist）
+跳跃表由层列表（指向其他节点的指针和到其他节点的距离）、后退指针（指向上一个节点的指针）、分值（类似权重，按大小排列）、成员对象组成。
+- 遍历：从表头开始，在层列表中找距离为1的指针，移动到下一个节点，以此类推直到碰到指针为null即到了表尾结束遍历
+
+##### 整数集合（intset）
+整数集合中数据都有序的存放在一个int数组中。（根据存储数据的类型可以是int8、int16、int32、int64等，根据encoding决定）
+- 类型升级操作：新插入的数据类型高于原类型，先在原来内存上扩容，然后根据顺序依次插入新数据和将原数据升级并挪动到对应位置（后移）
+- 降级：不存在的，不支持
+
+##### 压缩列表（ziplist）
+为了节约内存而开发，是一系列特殊编码的连续内存块组成的顺序型结构。(每个压缩列表节点的组成为previous_entry_length（前一个节点的字节长度）、encoding、content组成)
+- 通过任意节点的指针和previous_entry_length可以查找到上一个节点，依次类推可以找到头指针
+
+#### 对象类型
+##### 字符串（String）
+###### 数据结构（int、embstr、raw）
+- int：表示的为整数且可以用long表示
+- embstr：短字符串（字符串长度小于32字节）
+- raw：字符串长度大于32字节
+```
+struct sdshdr{
+    int len; //字符串长度，buf中已使用长度
+    int free;  //buf中未使用长度
+    char buf[]; //存储字符串数据，总长度=len + free + 1
+}
+```
+字符串扩展原则：小于1M，则free长度等于扩展长度，大于1M的free长度等于1M
 ###### 基本操作
-- 设置值 set key value [EX seconds|PX milliseconds]
+- 设置值 set key value \[EX seconds|PX milliseconds\]
 - 获取key的值 get key
 - expire|expireat|pexpire|pexpireat key time  为指定key设置超时时间（最终都是转换为pexpireat命令）
 - setnx key value 原子性的设置数据并设置过期时间，当key存在返回0，key不存在设置完成后返回1，setnx和expire配置使用做避免死锁的分布式锁
 
 ##### 列表（List）
 ###### 数据结构（ziplist或者linkedlist）
+当元素大小小于64字节且长度小于512时使用ziplist，否则使用linkedlist
 
 ##### Hash（哈希）
 ###### 数据结构（ziplist或者hashtable）
