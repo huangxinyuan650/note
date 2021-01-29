@@ -240,6 +240,29 @@ def swar(i):
     i = i *(0x01010101) >> 24
     return i
 ```
+
+#### Lua
+在redis操作中增加相关判断并且为原子操作（setnx后设置超时时间等）
+- eval script keyNums [key1...] [arg1...] (控制台中执行lua脚本，传入key、arg等信息)
+- eval load script (加载lua脚本，返回一个sha编码供evalsha调用)
+```
+---setnxex.lua----
+local key = KEYS[1]
+local value = ARGV[1]
+local expire_time = ARGV[2]
+if redis.call('setnx',key,value)
+then
+	redis.call('expire' , key , expire_time)
+	return redis.call('get',key)
+else
+	return 'error'
+end
+------call.py
+_lua = setnxex.lua.content # 自行读取
+_cmd = _conn.register_script(_lua)
+_re = _cmd(keys=['hxylock'],args=[1,10])
+```
+
 #### 事件
 文件事件和时间事件处理逻辑
 ```
