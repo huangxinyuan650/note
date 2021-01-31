@@ -118,14 +118,73 @@ class InsertSort(object):
             nums[_] = _tmp
         return nums
 
+class MergeSort(object):
+    """
+    归并排序
+    """
+
+    def sort(self, nums: list) -> list:
+        """
+        空间复杂度有点高，数组合并？
+        """
+
+        def merge(sub1, sub2):
+            """
+            合并两个顺序数组
+            """
+            _re = []
+            _i_1 = _i_2 = 0
+            _l1, _l2 = len(sub1), len(sub2)
+            while _i_1 < _l1 and _i_2 < _l2:
+                if sub1[_i_1] < sub2[_i_2]:
+                    _re.append(sub1[_i_1])
+                    _i_1 += 1
+                else:
+                    _re.append(sub2[_i_2])
+                    _i_2 += 1
+
+            _re += sub1[_i_1:] if _i_1 < _l1 else sub2[_i_2:]
+            return _re
+
+        def merge_sort(sub_nums):
+            """
+            先拆了排序，然后再合并
+            """
+            _l = len(sub_nums)
+            if _l == 1:
+                return sub_nums
+            else:
+                return merge(merge_sort(sub_nums[:_l // 2]), merge_sort(sub_nums[_l // 2:]))
+
+        return merge_sort(nums)
+
+
+def get_middle_node(header):
+    """
+    判断一个链表的中间节点
+    快慢指针，快指针一次访问两个节点，慢指针一次访问一个节点，当快指针到达表尾时慢指针为中间节点
+    """
+    _fast_cursor = _slow_cursor = header
+    while _fast_cursor and _fast_cursor.next:
+        _fast_cursor = _fast_cursor.next.next
+        _slow_cursor = _slow_cursor.next
+    if _fast_cursor:
+        # 节点奇数
+        return _slow_cursor.next
+    else:
+        # 节点偶数
+        return _slow_cursor
+
 
 _s1 = BooSort()
 _s2 = ChooseSort()
 _s3 = QuickSort()
 _s4 = InsertSort()
+_s5 = MergeSort()
 print(_s1.sort([7, 4, 8, 4, 9, 3, 1, 1, 0, 4, 6, 8]))
 print(_s2.sort([7, 4, 8, 4, 9, 3, 1, 1, 0, 4, 6, 8]))
 print(_s3.sort([7, 4, 8, 4, 9, 3, 7, 1, 1, 0, 4, 6, 8]))
 print(_s4.sort([7, 4, 8, 4, 9, 3, 7, 1, 1, 0, 4, 6, 8]))
+print(_s5.sort([7, 4, 8, 4, 9, 3, 7, 1, 1, 0, 4, 6, 8]))
 
 ```
