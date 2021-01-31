@@ -159,6 +159,41 @@ class MergeSort(object):
         return merge_sort(nums)
 
 
+class BucketSort(object):
+
+    def sort(self, nums):
+        """
+        桶排序
+        将数据丢到有序的范围桶中，然后桶内数据再使用快排进行排序，即完成对整个数据的排序
+        适用场景：数据无限，内存有限，分布均匀（逐步读取大文件，根据范围追加到范围的桶文件中，然后针对每个文件进行加载然后快速排序）
+        """
+
+
+class CountingSort(object):
+
+    def sort(self):
+        """
+        计数排序
+        桶排序的特殊情况：桶内数据大小相同
+        """
+
+
+class RadixSort(object):
+
+    def sort(self, nums):
+        """
+        基数排序：采用稳定排序，根据前_i-1个元素划分为一个桶
+        待排序数据可按位拆分，不足用0补齐
+        """
+        _k = 11
+        for _i in range(_k):
+            """
+            第_i位数据排序
+            先找到0-(_i-1)相同的作为一个桶，然后排序
+            """
+            pass
+
+
 def get_middle_node(header):
     """
     判断一个链表的中间节点
