@@ -194,6 +194,35 @@ class RadixSort(object):
             pass
 
 
+class ShellSort(object):
+
+    def sort(self, nums):
+        """
+        希尔排序
+        先n/2分组，然后在n/2/2直到步长为1，分组后采用直接插入排序
+        """
+        _l = len(nums)
+        _step = _l
+        while _step >= 2:
+            _step = _step // 2
+            for _ in range(_step):
+                """
+                采用直接插入排序将分组后的数据进行排序
+                """
+                _i = _ + _step
+                while _i < _l:
+                    _j = _i
+                    _t = nums[_i]
+                    while _j > _:
+                        if nums[_j - _step] > _t:
+                            nums[_j] = nums[_j - _step]
+                            _j -= _step
+                        else:
+                            break
+                    nums[_j] = _t
+                    _i += _step
+        return nums
+
 def get_middle_node(header):
     """
     判断一个链表的中间节点
@@ -216,10 +245,12 @@ _s2 = ChooseSort()
 _s3 = QuickSort()
 _s4 = InsertSort()
 _s5 = MergeSort()
+_s6 = ShellSort()
 print(_s1.sort([7, 4, 8, 4, 9, 3, 1, 1, 0, 4, 6, 8]))
 print(_s2.sort([7, 4, 8, 4, 9, 3, 1, 1, 0, 4, 6, 8]))
 print(_s3.sort([7, 4, 8, 4, 9, 3, 7, 1, 1, 0, 4, 6, 8]))
 print(_s4.sort([7, 4, 8, 4, 9, 3, 7, 1, 1, 0, 4, 6, 8]))
 print(_s5.sort([7, 4, 8, 4, 9, 3, 7, 1, 1, 0, 4, 6, 8]))
+print(_s6.sort([7, 4, 8, 4, 9, 3, 7, 1, 1, 0, 4, 6, 8]))
 
 ```
