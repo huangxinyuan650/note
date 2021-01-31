@@ -11,6 +11,7 @@ class BooSort(object):
     @staticmethod
     def sort(_list: list) -> list:
         """
+        冒泡排序：(大数沉底)在未排序区间从起始位开始比较相邻两个元素，若前一个数大于后一个数进行交换操作（根据由小到大还是由大到小自行调整）
         可优化，当某次冒泡不再出现交换操作时说明数据已经有序即可跳出排序
         """
         def swap(n):
@@ -29,6 +30,11 @@ class ChooseSort(object):
 
     @staticmethod
     def sort(_list: list) -> list:
+        """
+        选择排序：默认先设置起始位置为最大或最小值的索引，然后遍历未排序区间，
+        比较当前值是否比最大或者最小索引的值大或者小，若满足则将最大或者最小值的索引改为该索引，
+        遍历结束将起始位置和最大或者最小索引的位置进行交换
+        """
 
         for _i in range(len(_list) - 1):
             _min_i = _i
@@ -43,17 +49,23 @@ class QuickSort(object):
 
     @staticmethod
     def sort(_list: list) -> list:
+        """
+        快速排序：在指定区间内设置中间值为起始值，然后使用双指针从始末位置开始遍历，
+        先从末尾向开始方向遍历，当发现比中间值小则与左指针位置的值进行交换，
+        然后再从左指针的位置开始向末尾遍历当发现比中间值大则与右指针位置的值进行交换，如此往复到左右指针相遇
+        然后从起始位置到相遇位置和相遇位置到末尾分别执行上面逻辑
+        """
 
         def _sort(_start, _end):
             _s, _e = _start, _end
             _m = _list[_s]
             while _s < _e:
                 while _s < _e and _list[_e] >= _m:
-                    # 找到一个大于_m的值
+                    # 找到一个小于_m的值
                     _e -= 1
                 _list[_s] = _list[_e]
                 while _s < _e and _list[_s] <= _m:
-                    # 找到一个小于_m的值
+                    # 找到一个大于_m的值
                     _s += 1
                 _list[_e] = _list[_s]
             _list[_s] = _m
@@ -70,6 +82,10 @@ class QuickSort(object):
     def sort_again(_list: list) -> list:
         """
         起始值为基准
+        快速排序：在指定区间内设置中间值为起始值，然后使用双指针从始末位置开始遍历，
+        先从末尾向开始方向遍历，当发现比中间值小则与左指针位置的值进行交换，
+        然后再从左指针的位置开始向末尾遍历当发现比中间值大则与右指针位置的值进行交换，如此往复到左右指针相遇
+        然后从起始位置到相遇位置和相遇位置到末尾分别执行上面逻辑
         :param _list:
         :return:
         """
@@ -103,7 +119,7 @@ class InsertSort(object):
 
     def sort(self, nums: list) -> list:
         """
-        插入排序，初始状态第一个数为有序区，其余为无需区，然后从无序区一个个插入到有序区
+        插入排序：初始状态第一个数为有序区，其余为无需区，然后从无序区一个个插入到有序区
         """
         if len(nums) <= 1:
             return nums
@@ -120,7 +136,7 @@ class InsertSort(object):
 
 class MergeSort(object):
     """
-    归并排序
+    归并排序：先拆待排序数组为两部分，然后分别排序，排完后为两个顺序数组，然后合并两个顺序数组即得到一个有序数组
     """
 
     def sort(self, nums: list) -> list:
