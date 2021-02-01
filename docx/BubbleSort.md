@@ -239,6 +239,99 @@ class ShellSort(object):
                     _i += _step
         return nums
 
+
+HEAP_TYPE_BIG = 'big'
+HEAP_TYPE_SMALL = 'small'
+
+
+class HeapDemo(object):
+    """
+    手动实现堆：数组
+    主要实现，堆调整、堆排序（但排完序后堆就清空了QAQ）
+    """
+
+    def __init__(self, heap_type=HEAP_TYPE_BIG, max_size=None):
+        """
+        初始化堆，当有设置堆最大值时直接初始化堆大小
+        """
+        self._data = []
+        self._max_size = max_size if max_size else None
+        self._heap_type = heap_type
+
+    def adjust_heap_bottom(self):
+        """
+        调整堆，当push或者pop元素后对堆进行调整
+        自底向上开始调整堆
+        """
+        _i = len(self._data)
+        _p = _i // 2
+        while _i > 1 \
+                and ((self._heap_type == HEAP_TYPE_BIG and self._data[_i - 1] > self._data[_p - 1])
+                     or (self._heap_type == HEAP_TYPE_SMALL and self._data[_i - 1] < self._data[_p - 1])):
+            self._data[_i - 1], self._data[_p - 1] = self._data[_p - 1], self._data[_i - 1]
+            _i = _i // 2
+            _p = _i // 2
+
+    def adjust_heap_top(self):
+        """
+        当堆顶元素弹出时，自顶向下开始调整堆
+        """
+        _i = 1
+        _l = len(self._data)
+        while _i * 2 <= _l:
+            if _i * 2 + 1 <= _l:
+                _change_i = _i * 2 if (
+                        (self._heap_type == HEAP_TYPE_BIG and self._data[_i * 2 - 1] > self._data[_i * 2])
+                        or (self._heap_type == HEAP_TYPE_SMALL and self._data[_i * 2 - 1] < self._data[_i * 2])) \
+                    else _i * 2 + 1
+            else:
+                _change_i = _i * 2
+            if (self._heap_type == HEAP_TYPE_BIG and self._data[_i - 1] < self._data[_change_i - 1]) \
+                    or (self._heap_type == HEAP_TYPE_SMALL and self._data[_i - 1] > self._data[_change_i - 1]):
+                self._data[_i - 1], self._data[_change_i - 1], _i = self._data[_change_i - 1], self._data[
+                    _i - 1], _change_i
+            else:
+                break
+
+    def heap_push(self, value):
+        """
+        数据入堆，然后调整堆
+        对于堆满操作，大顶堆先弹出最小
+        """
+        if not self._max_size or len(self._data) <= self._max_size:
+            self._data.append(value)
+        else:
+            pass
+        self.adjust_heap_bottom()
+
+    def heap_pop(self):
+        """
+        出堆：从堆顶弹出元素，然后调整堆（由堆顶开始调整）
+        """
+        if len(self._data) < 1:
+            raise Exception
+        _pop_item = self._data[0]
+        self._data[0], self._data[-1] = self._data[-1], self._data[0]
+        self._data.pop()
+        self.adjust_heap_top()
+        return _pop_item
+
+    def heap_sort(self):
+        """
+        堆排序，逐个出堆然后调整堆
+        """
+        return [self.heap_pop() for _ in range(len(self._data))]
+
+    def top_k(self, k):
+        """
+        输出top-k
+        """
+        return self.heap_sort()[:k]
+
+    @property
+    def data(self):
+        return self._data
+
 def get_middle_node(header):
     """
     判断一个链表的中间节点
