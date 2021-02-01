@@ -39,6 +39,7 @@
 - [计数排序](docx/BubbleSort.md)
 - [基数排序](docx/BubbleSort.md)
 - [希尔排序](docx/BubbleSort.md)
+- [堆排序](docx/BubbleSort.md)
 - [先序遍历、中序遍历、后序遍历](docx/TreeView.md)
 - [深度优先、广度优先](docx/GraphView.md)
 - [最小树](docx/Minitree.md)
