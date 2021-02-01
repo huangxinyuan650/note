@@ -320,7 +320,10 @@ class HeapDemo(object):
         """
         堆排序，逐个出堆然后调整堆
         """
-        return [self.heap_pop() for _ in range(len(self._data))]
+        _tmp_data = self._data[::]
+        _sort_list = [self.heap_pop() for _ in range(len(self._data))]
+        self._data = _tmp_data
+        return _sort_list
 
     def top_k(self, k):
         """
