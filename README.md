@@ -30,6 +30,7 @@
 - [WebSocket](docx/WebSocket.md)
 
 #### 算法 Algorithm
+- [算法、数据结构简要说明](docx/Algorithm.md)
 - [冒泡排序](docx/BubbleSort.md)
 - [选择排序](docx/BubbleSort.md)
 - [快速排序](docx/BubbleSort.md)
