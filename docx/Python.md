@@ -1,8 +1,12 @@
 ### Python基础
 #### Python2和Python3的区别
 - print -> print()
-- 除法运算
-- 异常
+- raw_input、input->input 
+- 除法运算（/除数或被除数小数点才为真除 -> /真除）
+- xrange -> range
+- 字符串8bit -> 16bit unicode
+- bytes数组生成后不可变 （写文件时必须把字符串编码）
+- 异常 增加as
 - 八进制字面量表示
 等
 
