@@ -335,6 +335,30 @@ class HeapDemo(object):
     def data(self):
         return self._data
 
+
+class BinarySearch(object):
+    """
+    二分查找
+    """
+
+    def search(self, nums, aim):
+        """
+        """
+        _low, _high = 0, len(nums) - 1
+        while _low <= _high:
+            _mid = _low + ((_high - _low) >> 1)
+            if nums[_mid] == aim:
+                return _mid
+            elif nums[_mid] < aim:
+                _low = _mid + 1
+            else:
+                _high = _mid - 1
+        return '404'
+
+
+s = BinarySearch()
+print(s.search([1, 2, 3, 4, 5, 6, 7], 6))
+
 def get_middle_node(header):
     """
     判断一个链表的中间节点

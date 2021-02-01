@@ -44,6 +44,7 @@
 - [深度优先、广度优先](docx/GraphView.md)
 - [最小树](docx/Minitree.md)
 - [布隆过滤器](docx/Minitree.md)
+- [二分查找](docx/BubbleSort.md)
 
 #### 设计模式 Design Pattern
 - [单例](docx/SinglePattern.md)
