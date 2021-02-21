@@ -21,7 +21,7 @@ Celery worker -A Celery实例所在模块名 --loglevel=info
 
 - 3. 调用任务
 可以通过调用celery的delay或者apply_async方法来调用任务
-delay可以理解为apply_async的快捷方式，appy_async支持更多的参数，一般形式如下：
+delay可以理解为apply_async的快捷方式，apply_async支持更多的参数，一般形式如下：
 
 ```
 apply_async(args=(), kwargs={}, route_name=None, **options)
