@@ -15,5 +15,10 @@
 - 4、执行init方法
 - 5、执行main方法
 
+##### Go main方法 & init方法
+main方法和init方法均为Golang预留的方法，均为无参和无返回值的方法
+- main方法：程序入口，一个项目中只允许一个main function和main package
+- init方法：package加载时默认执行的方法，每个module或者文件都可以有一个或者多个init方法，执行的顺序按照文件字母排序的顺序执行，执行时机早于main方法
+
 #### Tips
 - interface{}作为函数参数则函数可接受任意类型参数，做为返回值则函数可返回任意类型的值
